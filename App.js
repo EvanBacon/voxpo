@@ -1,39 +1,53 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Image, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 import Main from './Main';
 import Expo from 'expo';
+import TouchableBounce from 'react-native/Libraries/Components/Touchable/TouchableBounce';
+
 export default class App extends React.Component {
   state = {}
   render() {
-    // if (!this.state.loaded) {
-    //   return <Expo.AppLoading />
-    // }
+    const pressIn = direction => {
+      if (this.state.game) {
+        this.state.game.player.controls[direction] = true;
+      }
+    }
+    const pressOut = direction => {
+      if (this.state.game) {
+        this.state.game.player.controls[direction] = null;
+      }
+    }
+    //jump
+    //die
+    //none
+    const rightButtonMap = {
+      top: "explosive",
+      left: "shotgun",
+      middle: "fire",
+      right: "rocket",
+      bottom: "die",
+    }
     return (
       <View style={{ flex: 1 }}>
+        <StatusBar hidden={false} />
+        <Main onLoaded={game => this.setState({ loaded: true, game })} />
+        <Dpad onPress={pressIn} onPressOut={pressOut} style={{ position: 'absolute', bottom: 8, left: 8 }} />
+        <Dpad buttonMap={rightButtonMap} style={{ position: 'absolute', bottom: 8, right: 8 }} onPress={pressIn} onPressOut={pressOut} />
+        {!this.state.loaded && <Loading />}
 
-        <Main onLoaded={game => {
-          this.setState({ loaded: true, game })
-        }} />
-        <Dpad onPress={direction => {
-          if (this.state.game) {
-            this.state.game.player.controls[direction] = true;
-          }
-        }} onPressOut={direction => {
-          if (this.state.game) {
-            this.state.game.player.controls[direction] = null;
-          }
-        }} style={{ position: 'absolute', bottom: 8, left: 8 }} />
-        <Dpad style={{ position: 'absolute', bottom: 8, right: 8 }}  onPress={direction => {
-          if (this.state.game) {
-            this.state.game.player.controls["rocket"] = true;
-          }
-        }} onPressOut={direction => {
-          if (this.state.game) {
-            this.state.game.player.controls["rocket"] = null;
-          }
-        }}/>
       </View>
     );
+  }
+}
+
+
+class Loading extends React.PureComponent {
+  render() {
+    return (
+      <Expo.LinearGradient style={StyleSheet.flatten([StyleSheet.absoluteFill, {flex: 1, justifyContent: 'center', alignItems: 'center'}])} colors={['#4c669f', '#3b5998', '#056ecf']}>
+        <TouchableBounce style={{aspectRatio: 1, height: "60%", alignItems: 'center', justifyContent: 'center'}}><Image style={{aspectRatio: 1, height: "100%", resizeMode: 'contain'}} source={require('./assets/icons/loading-icon.png')}/></TouchableBounce>
+        </Expo.LinearGradient>
+    )
   }
 }
 
@@ -52,24 +66,33 @@ class Button extends React.PureComponent {
 
 import DirectionType from './js/Direction'
 export class Dpad extends React.Component {
+  static defaultProps = {
+    buttonMap: {
+      top: DirectionType.forward,
+      left: DirectionType.left,
+      middle: DirectionType.up,
+      right: DirectionType.right,
+      bottom: DirectionType.backward,
+    }
+  }
   render() {
-    const { onPress, onPressOut, style } = this.props
+    const { onPress, onPressOut, style, buttonMap } = this.props
     return (
       <View pointerEvents={'box-none'} style={[styles.container, style]}>
         <View pointerEvents={'box-none'} style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <Button onPressOut={onPressOut} onPress={onPress} id={DirectionType.forward}
+          <Button onPressOut={onPressOut} onPress={onPress} id={buttonMap.top}
           />
         </View>
         <View pointerEvents={'box-none'} style={{ flexDirection: 'row' }}>
-          <Button onPressOut={onPressOut} onPress={onPress} id={DirectionType.left}
+          <Button onPressOut={onPressOut} onPress={onPress} id={buttonMap.left}
           />
-          <Button onPressOut={onPressOut} onPress={onPress} id={DirectionType.up}
+          <Button onPressOut={onPressOut} onPress={onPress} id={buttonMap.middle}
           />
-          <Button onPressOut={onPressOut} onPress={onPress} id={DirectionType.right}
+          <Button onPressOut={onPressOut} onPress={onPress} id={buttonMap.right}
           />
         </View>
         <View pointerEvents={'box-none'} style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <Button onPressOut={onPressOut} onPress={onPress} id={DirectionType.backward}
+          <Button onPressOut={onPressOut} onPress={onPress} id={buttonMap.bottom}
           />
         </View>
       </View>

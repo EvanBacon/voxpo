@@ -10,7 +10,8 @@
     "primaryColor": "#056ecf",
     "icon": "./assets/icons/app-icon.png",
     "loading": {
-      "icon": "./assets/icons/loading-icon.png"
+      "icon": "./assets/icons/loading-icon.png",
+      "backgroundColor": "#056ecf"
     },
     "packagerOpts": {
       "assetExts": ["ttf", "mp4", "vox"]

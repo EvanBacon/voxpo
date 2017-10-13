@@ -2,7 +2,6 @@ import React from 'react';
 import Vox from './Vox';
 import Physics from './Physics';
 import Type from './Type';
-
 import World from './World';
 import Phys from './Phys';
 import Player from './Player';
@@ -111,6 +110,9 @@ export default class Game {
         this.renderer = ExpoTHREE.createRenderer({ gl: this.gl, antialias: true });
         this.renderer.setPixelRatio(scale);
         this.renderer.setSize(width, height);
+        this.renderer.gammaInput = true;
+        this.renderer.gammaOutput = true;
+        this.renderer.shadowMap.enabled = true;
         // this.renderer.shadow.map.enabled = true;
         // this.renderer.shadow.map.type = THREE.PCFSoftShadowMap;
         // this.container = document.getElementById('container');

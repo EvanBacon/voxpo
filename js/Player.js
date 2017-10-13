@@ -7,71 +7,71 @@ import lfsr from './utils'
 import Settings from './Settings'
 
 export default class Player {
+    controls = {};
+    name = "Charles Cheevler";
+    hp = 0;
+    weapon = Weapon.rocket;
+
+    rotateAngle = 0;
+    moveDistance = 0;
+    // TBD: Make array of these with constants for lookup
+    run1Chunk;
+    run2Chunk;
+    run1RocketChunk;
+    run2RocketChunk;
+    run1ShotgunChunk;
+    run2ShotgunChunk;
+    jumpChunk;
+    jumpRocketChunk;
+    jumpShotgunChunk;
+    standChunk;
+    standRocketChunk;
+    standShotgunChunk;
+    fallChunk;
+    fallRocketChunk;
+    fallShotgunChunk;
+    shootChunk;
+    shootRocketChunk;
+    shootShotgunChunk;
+
+    mesh;
+    chunk;
+    currentModel = Model.stand;
+    runTime = 0;
+    jumpTime = 0;
+    cameraAttached = false;
+    // camera = new THREE.Object3D();
+    mass = 4;
+    area = 1;
+    vy = 1;
+    avg_ay = 1;
+    gravity = 9.82;
+    airDensity = 1.2;
+    jumping = false;
+    sampleObjectsTime = 0;
+    shooting = false;
+
+    // Camera
+    attachedCamera = false;
+    cameraObj;
+
+    // CD props
+    canWalkLeft = true;
+    canWalkRight = true;
+    canWalkForward = true;
+    canWalkBackward = true;
+    canJump = true;
+    canFall = true;
+
+
     constructor(phys, camera, world) {
         this.world = world;
         this.phys = phys;
         this.camera = camera;
-        this.name = "John Doe";
-        this.hp = 0;
-        this.weapon = Weapon.rocket;
-        this.rotateAngle = 0;
-        this.moveDistance = 0;
-        // TBD: Make array of these with constants for lookup
-        this.run1Chunk = undefined;
-        this.run2Chunk = undefined;
-        this.run1RocketChunk = undefined;
-        this.run2RocketChunk = undefined;
-        this.run1ShotgunChunk = undefined;
-        this.run2ShotgunChunk = undefined;
-        this.jumpChunk = undefined;
-        this.jumpRocketChunk = undefined;
-        this.jumpShotgunChunk = undefined;
-        this.standChunk = undefined;
-        this.standRocketChunk = undefined;
-        this.standShotgunChunk = undefined;
-        this.fallChunk = undefined;
-        this.fallRocketChunk = undefined;
-        this.fallShotgunChunk = undefined;
-        this.shootChunk = undefined;
-        this.shootRocketChunk = undefined;
-        this.shootShotgunChunk = undefined;
-
-        this.mesh = undefined;
-        this.chunk = undefined;
-        this.currentModel = Model.stand;
-        this.runTime = 0;
-        this.jumpTime = 0;
-        this.cameraAttached = false;
-        // this.camera = new THREE.Object3D();
-        this.mass = 4;
-        this.area = 1;
-        this.vy = 1;
-        this.avg_ay = 1;
-        this.gravity = 9.82;
-        this.airDensity = 1.2;
-        this.jumping = false;
-        this.sampleObjectsTime = 0;
-        // this.keyboard = new THREEx.KeyboardState();
-        this.shooting = false;
-
-        // Camera
-        this.attachedCamera = false;
-        this.cameraObj = undefined;
-
-        // CD props
-        this.canWalkLeft = true;
-        this.canWalkRight = true;
-        this.canWalkForward = true;
-        this.canWalkBackward = true;
-        this.canJump = true;
-        this.canFall = true;
     }
 
-
-
-
     init = (name) => {
-        this.addBindings();
+        this.addTouchListeners();
         this.name = name;
         this.hp = Settings.max_hp;
 
@@ -115,7 +115,6 @@ export default class Player {
         this.camera.quaternion.set(-0.7, 0, 0, 0.7);
         this.cameraObj.rotation.set(Math.PI / 1.5, 0, -Math.PI);
         this.weapon = Weapon.shotgun;
-
     }
 
     switchModel = (model) => {
@@ -248,21 +247,24 @@ export default class Player {
         this.mesh.visible = true;
     }
 
-    addBindings = () => {
-        window.document.addEventListener('touchstart',this.onMouseDown);
-        window.document.addEventListener('touchmoved',this.onMouseMove);
-        window.document.addEventListener('touchend',this.onMouseUp);
+    addTouchListeners = () => {
+        window.document.addEventListener('touchstart',this.touchStart);
+        window.document.addEventListener('touchmove',this.touchMove);
+        window.document.addEventListener('touchend',this.touchEnd);
     }
 
+    touchStart = (event) => {
+        if (this.dead) {
+            return;
+        }
+    }
 
-    
-
-    onMouseMove = (event) => {
+    touchMove = (event) => {
         // let event = jevent.originalEvent;
         let movementX = event.locationX;
         let movementZ = event.locationY;
-        let x = movementX * 0.001;
-        let z = movementZ * 0.001;
+        let x = movementX * 0.0001;
+        let z = movementZ * 0.0001;
 
         if (this.mesh != undefined) {
             let axis = new THREE.Vector3(0, 1, 0);
@@ -273,62 +275,34 @@ export default class Player {
         }
     }
 
-    onMouseDown = (event) => {
+    touchEnd = (event) => {
         if (this.dead) {
             return;
         }
-        // let mouseButton = event.keyCode || event.which;
-        // if (mouseButton != 1) {
-        //     return;
-        // }
-        this.switchModel(Model.shoot);
-        this.shooting = true;
     }
 
-    onMouseUp = (event) => {
-        if (this.dead) {
-            return;
+    createGrenade = () => {
+        let block = this.phys.get();
+
+        let pos = new THREE.Vector3(3, 2, 5);
+        let gpos = pos.applyMatrix4(this.mesh.matrix);
+
+        if (block != undefined) {
+            block.create(gpos.x,
+                gpos.y,
+                gpos.z,
+                0, // R 
+                66, // G
+                0, // B
+                5, // force 
+                4, // life,
+                Physics.grenade,
+                1000, // bounces
+                0.1 // mass
+            );
+            block.mesh.scale.set(1.5, 1.5, 1.5);
         }
-        // let mouseButton = event.keyCode || event.which;
-        // if (mouseButton == 1) {
-            switch (this.weapon) {
-                case Weapon.rocket:
-                    this.createMissile();
-                    break;
-                case Weapon.shotgun:
-                    this.createShot();
-                    break;
-            }
-            this.shooting = false;
-        // } else if (mouseButton == 3) {
-        //     this.createGrenade();
-        // }
     }
-
-    // createGrenade = () => {
-    //     let block = this.phys.get();
-
-    //     let pos = new THREE.Vector3(3, 2, 5);
-    //     let gpos = pos.applyMatrix4(this.mesh.matrix);
-
-    //     if (block != undefined) {
-    //         block.create(gpos.x,
-    //             gpos.y,
-    //             gpos.z,
-    //             0, // R 
-    //             66, // G
-    //             0, // B
-    //             5, // force 
-    //             4, // life,
-    //             Physics.grenade,
-    //             1000, // bounces
-    //             0.1 // mass
-    //         );
-    //         block.mesh.scale.set(1.5, 1.5, 1.5);
-    //     }
-
-
-    // }
 
     createShot = () => {
 
@@ -496,6 +470,11 @@ export default class Player {
         if (this.controls.die) {
             this.Die();
         }
+        if (this.controls.fire) {
+            this.switchModel(Model.shoot);
+            this.shooting = true;
+        }
+
         // if (this.keyboard.pressed("n")) {
         //     this.mesh.position.x += 5;
         // }
@@ -581,10 +560,23 @@ export default class Player {
             }
         }
     }
-    controls = {};
     keyUp = () => {
         if (this.controls.jump) {
             this.jumping = false;
+        }
+        if (this.controls.fire) {
+            switch (this.weapon) {
+                case Weapon.rocket:
+                    this.createMissile();
+                    break;
+                case Weapon.shotgun:
+                    this.createShot();
+                    break;
+            }
+            this.shooting = false;
+        }
+        if (this.controls.explosive) {
+            this.createGrenade();
         }
     }
 
@@ -737,6 +729,5 @@ export default class Player {
 
     spawn = (x, y, z) => {
         // Box of blocks -> remove all but the ones in mesh.
-
     }
 }
