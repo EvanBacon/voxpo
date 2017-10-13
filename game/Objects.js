@@ -1,6 +1,6 @@
 import React from 'react';
-import Weapon from './Weapon';
-import Settings from './Settings'
+import Weapon from '../enums/Weapon';
+import Settings from '../Settings'
 export default class Objects {
     constructor(world, phys) {
         this.world = world;

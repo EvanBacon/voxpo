@@ -1,7 +1,7 @@
 import React from 'react';
-import Chunk from './Chunk';
+import Chunk from '../enums/Chunk';
 import lfsr from './utils'
-import Physics from './Physics'
+import Physics from '../enums/Physics'
 // Binary string to decimal conversion
 String.prototype.bin = function () {
     return parseInt(this, 2);

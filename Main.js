@@ -1,7 +1,7 @@
 import Expo from 'expo';
 import React from 'react';
 import ExpoTHREE from 'expo-three';
-import Game from './js/Game';
+import Game from './game/Game';
 import ThreeView from './ThreeView';
 
 import './Three';

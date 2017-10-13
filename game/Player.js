@@ -1,10 +1,10 @@
 import React from 'react';
-import Weapon from './Weapon';
-import Model from './Model';
-import Direction from './Direction';
-import Physics from './Physics';
+import Weapon from '../enums/Weapon';
+import Model from '../enums/Model';
+import Direction from '../enums/Direction';
+import Physics from '../enums/Physics';
 import lfsr from './utils'
-import Settings from './Settings'
+import Settings from '../Settings'
 
 export default class Player {
     controls = {};

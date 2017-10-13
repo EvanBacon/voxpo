@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Physics from './Physics';
+import Physics from '../enums/Physics';
 import lfsr from './utils'
 export class MeshBlock {
     mesh;

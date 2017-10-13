@@ -84,7 +84,7 @@ class Button extends React.PureComponent {
   }
 }
 
-import DirectionType from './js/Direction'
+import DirectionType from './enums/Direction'
 export class Dpad extends React.Component {
   static defaultProps = {
     buttonMap: {

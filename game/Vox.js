@@ -1,8 +1,8 @@
 import React from 'react';
-import Type from './Type';
+import Type from '../enums/Type';
 import { ChunkItem } from './World'
 import Expo from 'expo';
-import Chunk from './Chunk';
+import Chunk from '../enums/Chunk';
 export class VoxelData {
     x;
     y;
