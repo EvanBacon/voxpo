@@ -266,8 +266,8 @@ export default class Player {
         // let event = jevent.originalEvent;
         let movementX = (event.locationX/window.innerWidth) - 0.5
         let movementZ = (event.locationY/window.innerHeight) - 0.5
-        let x = movementX * 0.01;
-        let z = movementZ * 0.01;
+        let x = movementX * 0.1;
+        let z = movementZ * 0.1;
 
         if (this.mesh != undefined) {
             let axis = new THREE.Vector3(0, 1, 0);
@@ -471,7 +471,7 @@ export default class Player {
             this.weapon = Weapon.none;
         }
         if (this.controls.die) {
-            this.Die();
+            this.die();
         }
         if (this.controls.fire) {
             this.switchModel(Model.shoot);

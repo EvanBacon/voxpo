@@ -10,21 +10,22 @@ import arrayFromObject from './util/arrayFromObject';
 import Maps from './Maps'
 import Models from './Models'
 export default class App extends React.Component {
-  state = {}
+  state = { assetsLoaded: false }
 
   async componentWillMount() {
-    await _preload();
+    await this._preload();
     this.setState({ assetsLoaded: true })
   }
   async _preload() {
+    const files = arrayFromObject(Models).concat(arrayFromObject(Maps));
     return await cacheAssetsAsync({
-      files: arrayFromObject(Models).concat(arrayFromObject(Maps))
+      files: files
     })
   }
 
   render() {
     if (!this.state.assetsLoaded) {
-      return (<Expo.AppLoading />);
+      return (<Loading />);
     }
     const pressIn = direction => {
       if (this.state.game) {

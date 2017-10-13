@@ -161,7 +161,7 @@ export default class World {
                     var py = (this.player.mesh.position.y + this.blockSize * 8) | 0;
                     var pz = (this.player.mesh.position.z + this.blockSize * 8) | 0;
                     if (px == xi && py == yi && pz == zi) {
-                        this.player.Die();
+                        this.player.die();
                     }
                 }
                 this.getChunk(xi, zi).dirty = true;
@@ -196,7 +196,7 @@ export default class World {
                         var py = (this.player.mesh.position.y - this.blockSize * 8) | 0;
                         var pz = (this.player.mesh.position.z + this.blockSize * 8) | 0;
                         if (px == rx && py == ry && pz == rz) {
-                            this.player.Die();
+                            this.player.die();
                         }
                     } else if (val > pow) {
                         if (this.isWithinWorld(rx, ry, rz)) {
