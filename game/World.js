@@ -3,6 +3,7 @@ import Chunk from '../enums/Chunk';
 import lfsr from './utils'
 import Physics from '../enums/Physics'
 import ChunkItem from './ChunkItem';
+import Settings from '../Settings';
 // Binary string to decimal conversion
 String.prototype.bin = function () {
     return parseInt(this, 2);
@@ -187,7 +188,8 @@ export default class World {
                             }
                         }
                     }
-                    if (val <= pow / 10) {
+
+                    if (val <= pow / 10 && Settings.animateExplosions) {
                         this.explosionBlock(rx, ry, rz);
                         if (lfsr.rand() > 0.8) {
                             this.smokeBlock(rx, ry, rz);

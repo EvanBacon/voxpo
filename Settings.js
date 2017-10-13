@@ -1,7 +1,8 @@
 export default {
     max_hp: 100,
-    shadows: false,
+    shadows: true,
     antialias: false,
-    fog: 0x339ce2
+    fog: 0x339ce2,
+    animateExplosions: true
 }
 

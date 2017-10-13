@@ -568,6 +568,8 @@ export default class Player {
             this.jumping = false;
         }
         if (this.controls.fire) {
+            this.controls.fire = null;
+            
             switch (this.weapon) {
                 case Weapon.rocket:
                     this.createMissile();
@@ -579,6 +581,7 @@ export default class Player {
             this.shooting = false;
         }
         if (this.controls.explosive) {
+            this.controls.explosive = null;
             this.createGrenade();
         }
     }
