@@ -264,8 +264,8 @@ export default class Player {
 
     touchMove = (event) => {
         // let event = jevent.originalEvent;
-        let movementX = (event.locationX/window.innerWidth) - 0.5
-        let movementZ = (event.locationY/window.innerHeight) - 0.5
+        let movementX = event.dx;
+        let movementZ = event.dy;
         let x = movementX * 0.1;
         let z = movementZ * 0.1;
 
