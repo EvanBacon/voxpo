@@ -1,25 +1,9 @@
 import React from 'react';
 import Type from '../enums/Type';
-import { ChunkItem } from './World'
+import ChunkItem from './ChunkItem'
 import Expo from 'expo';
 import Chunk from '../enums/Chunk';
-export class VoxelData {
-    x;
-    y;
-    z;
-    color;
-    constructor() {
-
-    }
-
-    create = (buffer, i, subSample) => {
-        this.x = (subSample ? buffer[i] & 0xFF / 2 : buffer[i++] & 0xFF);
-        this.y = (subSample ? buffer[i] & 0xFF / 2 : buffer[i++] & 0xFF);
-        this.z = (subSample ? buffer[i] & 0xFF / 2 : buffer[i++] & 0xFF);
-        this.color = buffer[i] & 0xFF;
-    }
-}
-
+import VoxelData from './VoxelData';
 
 export default class Vox {
     constructor(scene, world) {
@@ -54,201 +38,201 @@ export default class Vox {
         return new Promise(async (res, rej) => {
 
 
-        const asset = Expo.Asset.fromModule(filename);
-        if (!asset.localUri) {
-            await asset.downloadAsync();
-        }
+            const asset = Expo.Asset.fromModule(filename);
+            if (!asset.localUri) {
+                await asset.downloadAsync();
+            }
 
-        const oReq = new XMLHttpRequest();
-        oReq.open("GET", asset.localUri, true);
-        oReq.responseType = "arraybuffer";
+            const oReq = new XMLHttpRequest();
+            oReq.open("GET", asset.localUri, true);
+            oReq.responseType = "arraybuffer";
 
-        let chunk = 0;
-        if (type == Type.object) {
-            chunk = new ChunkItem();
-            chunk.type = 1; // TBD: OBJECT ( MAGIC NUMBER)
-            chunk.blockList = new Array();
-        }
+            let chunk = 0;
+            if (type == Type.object) {
+                chunk = new ChunkItem();
+                chunk.type = 1; // TBD: OBJECT ( MAGIC NUMBER)
+                chunk.blockList = new Array();
+            }
 
-        
 
-        oReq.onload = async (oEvent) => {
-            let colors = [];
-            let colors2 = undefined;
-            let voxelData = [];
 
-            console.log("Loaded model: " + oReq.responseURL);
-            let arrayBuffer = oReq.response;
-            if (arrayBuffer) {
-                let buffer = new Uint8Array(arrayBuffer);
-                let voxId = this.readInt(buffer, 0);
-                let version = this.readInt(buffer, 4);
-                // TBD: Check version to support
-                let i = 8;
-                while (i < buffer.length) {
-                    let subSample = false;
-                    let sizex = 0, sizey = 0, sizez = 0;
-                    let id = String.fromCharCode(parseInt(buffer[i++])) +
-                        String.fromCharCode(parseInt(buffer[i++])) +
-                        String.fromCharCode(parseInt(buffer[i++])) +
-                        String.fromCharCode(parseInt(buffer[i++]));
+            oReq.onload = async (oEvent) => {
+                let colors = [];
+                let colors2 = undefined;
+                let voxelData = [];
 
-                    let chunkSize = this.readInt(buffer, i) & 0xFF;
-                    i += 4;
-                    let childChunks = this.readInt(buffer, i) & 0xFF;
-                    i += 4;
+                console.log("Loaded model: " + oReq.responseURL);
+                let arrayBuffer = oReq.response;
+                if (arrayBuffer) {
+                    let buffer = new Uint8Array(arrayBuffer);
+                    let voxId = this.readInt(buffer, 0);
+                    let version = this.readInt(buffer, 4);
+                    // TBD: Check version to support
+                    let i = 8;
+                    while (i < buffer.length) {
+                        let subSample = false;
+                        let sizex = 0, sizey = 0, sizez = 0;
+                        let id = String.fromCharCode(parseInt(buffer[i++])) +
+                            String.fromCharCode(parseInt(buffer[i++])) +
+                            String.fromCharCode(parseInt(buffer[i++])) +
+                            String.fromCharCode(parseInt(buffer[i++]));
 
-                    if (id == "SIZE") {
-                        sizex = this.readInt(buffer, i) & 0xFF;
+                        let chunkSize = this.readInt(buffer, i) & 0xFF;
                         i += 4;
-                        sizey = this.readInt(buffer, i) & 0xFF;
+                        let childChunks = this.readInt(buffer, i) & 0xFF;
                         i += 4;
-                        sizez = this.readInt(buffer, i) & 0xFF;
-                        i += 4;
-                        if (sizex > 32 || sizey > 32) {
-                            subSample = true;
-                        }
-                        i += chunkSize - 4 * 3;
-                    } else if (id == "XYZI") {
-                        let numVoxels = Math.abs(this.readInt(buffer, i));
-                        i += 4;
-                        voxelData = new Array(numVoxels);
-                        for (let n = 0; n < voxelData.length; n++) {
-                            ;
-                            voxelData[n] = new VoxelData();
-                            voxelData[n].create(buffer, i, subSample); // Read 4 bytes
+
+                        if (id == "SIZE") {
+                            sizex = this.readInt(buffer, i) & 0xFF;
                             i += 4;
+                            sizey = this.readInt(buffer, i) & 0xFF;
+                            i += 4;
+                            sizez = this.readInt(buffer, i) & 0xFF;
+                            i += 4;
+                            if (sizex > 32 || sizey > 32) {
+                                subSample = true;
+                            }
+                            i += chunkSize - 4 * 3;
+                        } else if (id == "XYZI") {
+                            let numVoxels = Math.abs(this.readInt(buffer, i));
+                            i += 4;
+                            voxelData = new Array(numVoxels);
+                            for (let n = 0; n < voxelData.length; n++) {
+                                ;
+                                voxelData[n] = new VoxelData();
+                                voxelData[n].create(buffer, i, subSample); // Read 4 bytes
+                                i += 4;
+                            }
+                        } else if (id == "RGBA") {
+                            colors2 = new Array(256);
+                            for (let n = 0; n < 256; n++) {
+                                let r = buffer[i++] & 0xFF;
+                                let g = buffer[i++] & 0xFF;
+                                let b = buffer[i++] & 0xFF;
+                                let a = buffer[i++] & 0xFF;
+                                colors2[n] = { 'r': r, 'g': g, 'b': b, 'a': a };
+                            }
+                        } else {
+                            i += chunkSize;
                         }
-                    } else if (id == "RGBA") {
-                        colors2 = new Array(256);
-                        for (let n = 0; n < 256; n++) {
-                            let r = buffer[i++] & 0xFF;
-                            let g = buffer[i++] & 0xFF;
-                            let b = buffer[i++] & 0xFF;
-                            let a = buffer[i++] & 0xFF;
-                            colors2[n] = { 'r': r, 'g': g, 'b': b, 'a': a };
-                        }
-                    } else {
-                        i += chunkSize;
                     }
-                }
-                
-                if (voxelData == null || voxelData.length == 0) {
-                    // return null;
-                    res({});
-                }
 
-                for (let n = 0; n < voxelData.length; n++) {
-                    if (colors2 == undefined) {
-                        let c = voxColors[Math.abs(voxelData[n].color - 1)];
-                        let cRGBA = {
-                            b: (c & 0xff0000) >> 16,
-                            g: (c & 0x00ff00) >> 8,
-                            r: (c & 0x0000ff),
-                            a: 1
-                        };
-                        // for(var x = (voxelData[n].x*size)-size; x < (voxelData[n].x*size)+size; x++) {
-                        //     this.world.addBlock(x, voxelData[n].z*size, voxelData[n].y*size, [cRGBA.r,cRGBA.g,cRGBA.b]);
-                        //     for(var z = (voxelData[n].z*size)-size; z < (voxelData[n].z*size)+size; z++) {
-                        //         this.world.addBlock(voxelData[n].x*size, z, voxelData[n].y*size, [cRGBA.r,cRGBA.g,cRGBA.b]);
-                        //         for(var y = (voxelData[n].y*size)-size; y < (voxelData[n].y*size)+size; y++) {
-                        //             this.world.addBlock(voxelData[n].x*size, voxelData[n].z*size, y, [cRGBA.r,cRGBA.g,cRGBA.b]);
-                        //             this.world.addBlock(voxelData[n].x*size, z, y, [cRGBA.r,cRGBA.g,cRGBA.b]);
-                        //             this.world.addBlock(x, z, y, [cRGBA.r,cRGBA.g,cRGBA.b]);
-                        //         }
-                        //     }
-                        // }
-                        // this.world.addBlock(voxelData[n].x*size, voxelData[n].z*size, voxelData[n].y*size, [cRGBA.r,cRGBA.g,cRGBA.b]);
-                        //       this.world.addBlock(voxelData[n].x, voxelData[n].z, voxelData[n].y, [cRGBA.r,cRGBA.g,cRGBA.b]);
-                    } else {
-                        let color = colors2[Math.abs(voxelData[n].color - 1)];
-                        // for(var x = (voxelData[n].x*size)-size; x < (voxelData[n].x*size)+size; x++) {
-                        //     this.world.addBlock(x, voxelData[n].z*size, voxelData[n].y*size, [color.r,color.g,color.b]);
-                        //     for(var z = (voxelData[n].z*size)-size; z < (voxelData[n].z*size)+size; z++) {
-                        //         this.world.addBlock(voxelData[n].x*size, z, voxelData[n].y*size, [color.r,color.g,color.b]);
-                        //         for(var y = (voxelData[n].y*size)-size; y < (voxelData[n].y*size)+size; y++) {
-                        //             this.world.addBlock(voxelData[n].x*size, voxelData[n].z*size, y, [color.r,color.g,color.b]);
-                        //             this.world.addBlock(voxelData[n].x*size, z, y, [color.r,color.g,color.b]);
-                        //             this.world.addBlock(x, z, y, [color.r,color.g,color.b]);
-                        //         }
-                        //     }
-                        // }
-                        //this.world.addBlock(voxelData[n].x*size, voxelData[n].z*size, voxelData[n].y*size, [color.r,color.g,color.b]);
+                    if (voxelData == null || voxelData.length == 0) {
+                        // return null;
+                        res({});
+                    }
 
-                        //this.world.addBlock(voxelData[n].x, voxelData[n].z, 100-voxelData[n].y, [color.r,color.g,color.b]);
-                        let x = voxelData[n].x;
-                        let y = voxelData[n].y;
-                        let z = voxelData[n].z;
-                        if (type == Type.map) {
-                            for (let x1 = x * 2 + 1; x1 < x * 2 + 3; x1++) {
-                                for (let z1 = z * 2 + 1; z1 < z * 2 + 3; z1++) {
-                                    for (let y1 = y * 2 + 1; y1 < y * 2 + 3; y1++) {
-                                        this.world.addBlock(x1, z1, 200 - y1, [color.r, color.g, color.b]); // TBD: 200 just for this map size.
+                    for (let n = 0; n < voxelData.length; n++) {
+                        if (colors2 == undefined) {
+                            let c = voxColors[Math.abs(voxelData[n].color - 1)];
+                            let cRGBA = {
+                                b: (c & 0xff0000) >> 16,
+                                g: (c & 0x00ff00) >> 8,
+                                r: (c & 0x0000ff),
+                                a: 1
+                            };
+                            // for(var x = (voxelData[n].x*size)-size; x < (voxelData[n].x*size)+size; x++) {
+                            //     this.world.addBlock(x, voxelData[n].z*size, voxelData[n].y*size, [cRGBA.r,cRGBA.g,cRGBA.b]);
+                            //     for(var z = (voxelData[n].z*size)-size; z < (voxelData[n].z*size)+size; z++) {
+                            //         this.world.addBlock(voxelData[n].x*size, z, voxelData[n].y*size, [cRGBA.r,cRGBA.g,cRGBA.b]);
+                            //         for(var y = (voxelData[n].y*size)-size; y < (voxelData[n].y*size)+size; y++) {
+                            //             this.world.addBlock(voxelData[n].x*size, voxelData[n].z*size, y, [cRGBA.r,cRGBA.g,cRGBA.b]);
+                            //             this.world.addBlock(voxelData[n].x*size, z, y, [cRGBA.r,cRGBA.g,cRGBA.b]);
+                            //             this.world.addBlock(x, z, y, [cRGBA.r,cRGBA.g,cRGBA.b]);
+                            //         }
+                            //     }
+                            // }
+                            // this.world.addBlock(voxelData[n].x*size, voxelData[n].z*size, voxelData[n].y*size, [cRGBA.r,cRGBA.g,cRGBA.b]);
+                            //       this.world.addBlock(voxelData[n].x, voxelData[n].z, voxelData[n].y, [cRGBA.r,cRGBA.g,cRGBA.b]);
+                        } else {
+                            let color = colors2[Math.abs(voxelData[n].color - 1)];
+                            // for(var x = (voxelData[n].x*size)-size; x < (voxelData[n].x*size)+size; x++) {
+                            //     this.world.addBlock(x, voxelData[n].z*size, voxelData[n].y*size, [color.r,color.g,color.b]);
+                            //     for(var z = (voxelData[n].z*size)-size; z < (voxelData[n].z*size)+size; z++) {
+                            //         this.world.addBlock(voxelData[n].x*size, z, voxelData[n].y*size, [color.r,color.g,color.b]);
+                            //         for(var y = (voxelData[n].y*size)-size; y < (voxelData[n].y*size)+size; y++) {
+                            //             this.world.addBlock(voxelData[n].x*size, voxelData[n].z*size, y, [color.r,color.g,color.b]);
+                            //             this.world.addBlock(voxelData[n].x*size, z, y, [color.r,color.g,color.b]);
+                            //             this.world.addBlock(x, z, y, [color.r,color.g,color.b]);
+                            //         }
+                            //     }
+                            // }
+                            //this.world.addBlock(voxelData[n].x*size, voxelData[n].z*size, voxelData[n].y*size, [color.r,color.g,color.b]);
+
+                            //this.world.addBlock(voxelData[n].x, voxelData[n].z, 100-voxelData[n].y, [color.r,color.g,color.b]);
+                            let x = voxelData[n].x;
+                            let y = voxelData[n].y;
+                            let z = voxelData[n].z;
+                            if (type == Type.map) {
+                                for (let x1 = x * 2 + 1; x1 < x * 2 + 3; x1++) {
+                                    for (let z1 = z * 2 + 1; z1 < z * 2 + 3; z1++) {
+                                        for (let y1 = y * 2 + 1; y1 < y * 2 + 3; y1++) {
+                                            this.world.addBlock(x1, z1, 200 - y1, [color.r, color.g, color.b]); // TBD: 200 just for this map size.
+                                        }
                                     }
                                 }
+                            } else if (type == Type.object) {
+                                let b = new Object();
+                                b.x = x + 5;
+                                b.y = y + 10;
+                                b.z = z + 5;
+                                b.color = [color.r, color.g, color.b];
+                                // b.val = (color.r & 0xFF) << 24 | (color.g & 0xFF) << 16 | (color.b & 0xFF) << 8;
+                                this.world.addBlock(x + 5, z + 5, y + 10, [color.r, color.g, color.b]);
+                                chunk.blockList.push(b);
                             }
-                        } else if (type == Type.object) {
-                            let b = new Object();
-                            b.x = x + 5;
-                            b.y = y + 10;
-                            b.z = z + 5;
-                            b.color = [color.r, color.g, color.b];
-                            // b.val = (color.r & 0xFF) << 24 | (color.g & 0xFF) << 16 | (color.b & 0xFF) << 8;
-                            this.world.addBlock(x + 5, z + 5, y + 10, [color.r, color.g, color.b]);
-                            chunk.blockList.push(b);
                         }
                     }
-                }
-                if (type == Type.object) {
-                    chunk.dirty = true;
-                    chunk.fromX = 1000; // just some large value 
-                    chunk.fromZ = 1000;
-                    chunk.fromY = 1000;
-                    chunk.type = Chunk.object;
+                    if (type == Type.object) {
+                        chunk.dirty = true;
+                        chunk.fromX = 1000; // just some large value 
+                        chunk.fromZ = 1000;
+                        chunk.fromY = 1000;
+                        chunk.type = Chunk.object;
 
-                    for (let q = 0; q < chunk.blockList.length; q++) {
-                        let b = chunk.blockList[q];
-                        b.val = this.world.blocks[b.x][b.y][b.z];
-                        if (b.x < chunk.fromX) {
-                            chunk.fromX = b.x;
+                        for (let q = 0; q < chunk.blockList.length; q++) {
+                            let b = chunk.blockList[q];
+                            b.val = this.world.blocks[b.x][b.y][b.z];
+                            if (b.x < chunk.fromX) {
+                                chunk.fromX = b.x;
+                            }
+                            if (b.x > chunk.toX) {
+                                chunk.toX = b.x;
+                            }
+                            if (b.y > chunk.toY) {
+                                chunk.toY = b.y;
+                            }
+                            if (b.y < chunk.fromY) {
+                                chunk.fromY = b.y;
+                            }
+                            if (b.z < chunk.fromZ) {
+                                chunk.fromZ = b.z;
+                            }
+                            if (b.z > chunk.toZ) {
+                                chunk.toZ = b.z;
+                            }
                         }
-                        if (b.x > chunk.toX) {
-                            chunk.toX = b.x;
-                        }
-                        if (b.y > chunk.toY) {
-                            chunk.toY = b.y;
-                        }
-                        if (b.y < chunk.fromY) {
-                            chunk.fromY = b.y;
-                        }
-                        if (b.z < chunk.fromZ) {
-                            chunk.fromZ = b.z;
-                        }
-                        if (b.z > chunk.toZ) {
-                            chunk.toZ = b.z;
-                        }
+                        // Increase area to view all voxels for mesh creation
+                        chunk.fromX -= 2;
+                        chunk.fromY -= 6;
+                        chunk.fromZ -= 2;
+                        chunk.toX += 2;
+                        chunk.toY += 4;
+                        chunk.toZ += 8;
+                        this.world.rebuildChunk(chunk);
+                        chunk.mesh.visible = false;
+
+                        res({ vox: this, chunk })
+
+                    } else {
+                        this.world.rebuildDirtyChunks(1);
+                        res({ vox: this });
                     }
-                    // Increase area to view all voxels for mesh creation
-                    chunk.fromX -= 2;
-                    chunk.fromY -= 6;
-                    chunk.fromZ -= 2;
-                    chunk.toX += 2;
-                    chunk.toY += 4;
-                    chunk.toZ += 8;
-                    this.world.rebuildChunk(chunk);
-                    chunk.mesh.visible = false;
-
-                    res({vox: this, chunk})
-                    
-                } else {
-                    this.world.rebuildDirtyChunks(1);
-                    res({vox: this});
                 }
             }
-        }
 
-        oReq.send(null);
-    })
+            oReq.send(null);
+        })
     }
 }
 

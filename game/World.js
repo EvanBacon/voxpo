@@ -2,6 +2,7 @@ import React from 'react';
 import Chunk from '../enums/Chunk';
 import lfsr from './utils'
 import Physics from '../enums/Physics'
+import ChunkItem from './ChunkItem';
 // Binary string to decimal conversion
 String.prototype.bin = function () {
     return parseInt(this, 2);
@@ -17,26 +18,6 @@ Number.prototype.bin = function () {
     return sign + result;
 }
 
-export class ChunkItem {
-    mesh = undefined;
-    blocks = 0;
-    triangles = 0;
-    dirty = false;
-    fromX = 0;
-    fromY = 0;
-    fromZ = 0;
-    toX = 0;
-    toY = 0;
-    toZ = 0;
-    x = 0;
-    y = 0;
-    z = 0;
-    type = 0; // 0 = world, 1 = object
-    blockList = 0;
-    constructor() {
-
-    }
-}
 export default class World {
 
 
@@ -44,7 +25,7 @@ export default class World {
         this.scene = scene;
         this.player = player;
         this.phys = phys;
-        
+
         this.worldSize = 192;
         this.chunkBase = 16;
         this.worldDivBase = this.worldSize / this.chunkBase;
@@ -289,8 +270,8 @@ export default class World {
         if (posx < 0 || posz < 0) {
             return undefined;
         }
-        
-        if (!this.chunks || !this.chunks[posx]  || !this.chunks[posx][posz]) {
+
+        if (!this.chunks || !this.chunks[posx] || !this.chunks[posx][posz]) {
             console.warn("error: chunks failed to load");
             return undefined;
         }
@@ -322,7 +303,7 @@ export default class World {
         for (var m = 0; m < newChunks.length; m++) {
             var ff = newChunks[m];
             // create chunk 
-            var chunk = new ChunkItem();
+            const chunk = new ChunkItem();
             chunk.dirty = true;
             chunk.fromX = 5000; // just some large value > world.
             chunk.fromZ = 5000;

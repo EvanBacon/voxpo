@@ -104,7 +104,7 @@ export default class Player {
                 mesh.geometry.verticesNeedUpdate = true;
             }
         }
-        
+
         this.switchModel(Model.stand);
         this.mesh.position.set(153, 21, 55);
 
@@ -115,7 +115,7 @@ export default class Player {
         this.camera.position.set(0, 400, 0);
         this.camera.lookAt(this.cameraObj);
         this.camera.rotation.set(-1.57, 0, 0),
-        this.camera.quaternion.set(-0.7, 0, 0, 0.7);
+            this.camera.quaternion.set(-0.7, 0, 0, 0.7);
         this.cameraObj.rotation.set(Math.PI / 1.5, 0, -Math.PI);
         this.weapon = Weapon.shotgun;
     }
@@ -251,9 +251,9 @@ export default class Player {
     }
 
     addTouchListeners = () => {
-        window.document.addEventListener('touchstart',this.touchStart);
-        window.document.addEventListener('touchmove',this.touchMove);
-        window.document.addEventListener('touchend',this.touchEnd);
+        window.document.addEventListener('touchstart', this.touchStart);
+        window.document.addEventListener('touchmove', this.touchMove);
+        window.document.addEventListener('touchend', this.touchEnd);
     }
 
     touchStart = (event) => {

@@ -6,9 +6,11 @@ import TouchableBounce from 'react-native/Libraries/Components/Touchable/Touchab
 
 import cacheAssetsAsync from './util/cacheAssetsAsync';
 import arrayFromObject from './util/arrayFromObject';
+import DirectionType from './enums/Direction'
 
 import Maps from './Maps'
 import Models from './Models'
+
 export default class App extends React.Component {
   state = { assetsLoaded: false }
 
@@ -84,7 +86,6 @@ class Button extends React.PureComponent {
   }
 }
 
-import DirectionType from './enums/Direction'
 export class Dpad extends React.Component {
   static defaultProps = {
     buttonMap: {
