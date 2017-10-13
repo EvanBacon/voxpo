@@ -57,6 +57,21 @@ export default class Game {
         this.scene.add(this.camera);
     }
 
+    setupRenderer = () => {
+        const { innerWidth: width, innerHeight: height, devicePixelRatio: scale } = window;
+
+        this.renderer = ExpoTHREE.createRenderer({ gl: this.gl, antialias: true });
+        this.renderer.setPixelRatio(scale);
+        this.renderer.setSize(width, height);
+        this.renderer.gammaInput = true;
+        this.renderer.gammaOutput = true;
+        this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+        this.scene.fog = new THREE.Fog(0x339ce2, 100, 3000);
+        this.renderer.setClearColor(0x339ce2, 1);
+
+    }
     setupLights = () => {
         const ambientLight = new THREE.AmbientLight(0xEEB1C6);
         this.scene.add(ambientLight);
@@ -86,46 +101,40 @@ export default class Game {
         this.scene.add(dirLight);
 
     }
-    init = async () => {
-        this.setupScene();
-
-        const { innerWidth: width, innerHeight: height, devicePixelRatio: scale } = window;
-
-        this.renderer = ExpoTHREE.createRenderer({ gl: this.gl, antialias: true });
-        this.renderer.setPixelRatio(scale);
-        this.renderer.setSize(width, height);
-        this.renderer.gammaInput = true;
-        this.renderer.gammaOutput = true;
-        this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-        this.scene.fog = new THREE.Fog(0x339ce2, 100, 3000);
-        this.renderer.setClearColor(0x339ce2, 1);
-
-        this.setupLights();
+    setupRollover = () => {
 
         // Voxel paint
         const rollOverGeo = new THREE.BoxGeometry(1, 1, 1);
         const rollOverMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, opacity: 0.5, transparent: true });
         this.rollOverMesh = new THREE.Mesh(rollOverGeo, rollOverMaterial);
         this.scene.add(this.rollOverMesh);
+    }
 
-        this.phys;
-        this.world = new World(this.scene, this.player, this.phys);
+    init = async () => {
+        this.setupScene();
+        this.setupRenderer();
+        this.setupLights();
+        // this.setupRollover();
 
-        this.phys = new Phys(this.scene, this.world, this.player);
-        this.world.phys = this.phys;
+        this.world = new World(this.scene);
+
+        this.phys = new Phys(this.scene, this.world);
 
         this.player = new Player(this.phys, this.camera, this.world);
 
+        this.world.phys = this.phys;
         this.world.player = this.player;
-        this.proc = new Proc(this.world);
+
         this.phys.player = this.player;
 
-        await this.setupVox();
+        // this.proc = new Proc(this.world);
 
         this.world.init();
         this.phys.init();
+        
+        await this.setupVox();
+
+
 
         // this.controls = new THREE.OrbitControls(this.camera);
     }
@@ -263,9 +272,9 @@ export default class Game {
                 item.retVal(_vox, chunk, this.player);
             } catch (error) {
                 console.warn("Model Failed To Load")
-                console.warn({error});
+                console.warn({ error });
             }
-            
+
         }
     }
 
@@ -278,71 +287,75 @@ export default class Game {
         this.renderer.setSize(width, height);
     }
 
-   
-
     render = () => this.renderer.render(this.scene, this.camera);
-    
 
     animate = (delta) => {
         this.render();
         this.update(delta);
     }
 
+    renderWaterfall = (delta) => {
+        // Test waterfall
+        if ((this.world.blocks[98][67][83] >> 8) != 0) {
+            if (Math.random() > 0.5) {
+                var block = this.phys.get();
+                if (block != undefined) {
+                    block.gravity = 1;
+                    let r = 15;
+                    let g = 169;
+                    let b = 189;
+                    if (lfsr.rand() > 0.5) {
+                        r = 36;
+                        g = 152;
+                        b = 229;
+                    }
+                    block.create(86 + lfsr.rand() * 5,
+                        65,
+                        92,
+                        r,
+                        g,
+                        b,
+                        -1, 10, Physics.smoke, 1);
+                }
+            }
+            // Test fountain
+            if (Math.random() > 0.7) {
+                const block = this.phys.get();
+                if (block != undefined) {
+                    block.gravity = 1;
+                    let r = 15;
+                    let g = 169;
+                    let b = 189;
+                    if (lfsr.rand() > 0.5) {
+                        r = 255;
+                        g = 255;
+                        b = 255;
+                    }
+                    block.create(85 + lfsr.rand() * 7,
+                        36,
+                        90 + lfsr.rand() * 5,
+                        r,
+                        g,
+                        b,
+                        0.5, 5, Physics.smoke, 1);
+                }
+            }
+        }
+    }
+    renderElements = (delta, time) => {
+        this.player.draw(time, this.invMaxFps);
+        this.phys.draw(time, this.invMaxFps);
+        this.frameDelta -= this.invMaxFps;
+        this.world.draw(time, delta);
+
+        this.renderWaterfall(delta);
+    }
+    
     update = (delta) => {
         let time = Date.now() * 10;
         this.frameDelta += delta;
         while (this.frameDelta >= this.invMaxFps) {
-            this.player.draw(time, this.invMaxFps);
-            this.phys.draw(time, this.invMaxFps);
-            this.frameDelta -= this.invMaxFps;
-            this.world.draw(time, delta);
-
-            // Test waterfall
-            if ((this.world.blocks[98][67][83] >> 8) != 0) {
-                if (Math.random() > 0.5) {
-                    const block = this.phys.get();
-                    if (block != undefined) {
-                        block.gravity = 1;
-                        let r = 15;
-                        let g = 169;
-                        let b = 189;
-                        if (lfsr.rand() > 0.5) {
-                            r = 36;
-                            g = 152;
-                            b = 229;
-                        }
-                        block.create(86 + lfsr.rand() * 5,
-                            65,
-                            92,
-                            r,
-                            g,
-                            b,
-                            -1, 10, Physics.smoke, 1);
-                    }
-                }
-                // Test fountain
-                if (Math.random() > 0.7) {
-                    const block = this.phys.get();
-                    if (block != undefined) {
-                        block.gravity = 1;
-                        let r = 15;
-                        let g = 169;
-                        let b = 189;
-                        if (lfsr.rand() > 0.5) {
-                            r = 255;
-                            g = 255;
-                            b = 255;
-                        }
-                        block.create(85 + lfsr.rand() * 7,
-                            36,
-                            90 + lfsr.rand() * 5,
-                            r,
-                            g,
-                            b,
-                            0.5, 5, Physics.smoke, 1);
-                    }
-                }
-            }
+            this.renderElements(delta, time)
         }
     }
 

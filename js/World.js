@@ -289,6 +289,11 @@ export default class World {
         if (posx < 0 || posz < 0) {
             return undefined;
         }
+        
+        if (!this.chunks || !this.chunks[posx]  || !this.chunks[posx][posz]) {
+            console.warn("error: chunks failed to load");
+            return undefined;
+        }
         return this.chunks[posx][posz];
     }
 
