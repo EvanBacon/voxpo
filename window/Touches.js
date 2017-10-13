@@ -20,10 +20,10 @@ export default (WrappedComponent) => {
         onMoveShouldSetPanResponder: (evt, gestureState) => true,
         onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
     
-        onPanResponderGrant: (({nativeEvent, gestureState}) => onTouchStart({...nativeEvent, ...gestureState})),
-        onPanResponderMove: (({nativeEvent, gestureState}) => onTouchMove({...nativeEvent, ...gestureState})),
-        onPanResponderRelease: (({nativeEvent, gestureState}) => onTouchEnd({...nativeEvent, ...gestureState})),
-        onPanResponderTerminate: (({nativeEvent, gestureState}) => onTouchCancel ? onTouchCancel({...nativeEvent, ...gestureState}) : onTouchEnd({...nativeEvent, ...gestureState}) ),
+        onPanResponderGrant: (({nativeEvent}, gestureState) => onTouchStart({...nativeEvent, ...gestureState})),
+        onPanResponderMove: (({nativeEvent}, gestureState) => onTouchMove({...nativeEvent, ...gestureState})),
+        onPanResponderRelease: (({nativeEvent}, gestureState) => onTouchEnd({...nativeEvent, ...gestureState})),
+        onPanResponderTerminate: (({nativeEvent}, gestureState) => onTouchCancel ? onTouchCancel({...nativeEvent, ...gestureState}) : onTouchEnd({...nativeEvent, ...gestureState}) ),
       })
 
       _emit = (type, props) => {

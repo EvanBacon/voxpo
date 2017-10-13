@@ -11,6 +11,9 @@ import ExpoTHREE from 'expo-three';
 import lfsr from './utils'
 import Models from '../Models';
 import Maps from '../Maps';
+
+
+const HAS_SHADOWS = false;
 export default class Game {
 
     scene;
@@ -63,10 +66,13 @@ export default class Game {
         this.renderer = ExpoTHREE.createRenderer({ gl: this.gl, antialias: true });
         this.renderer.setPixelRatio(scale);
         this.renderer.setSize(width, height);
-        this.renderer.gammaInput = true;
-        this.renderer.gammaOutput = true;
-        this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        if (HAS_SHADOWS) {
+            this.renderer.gammaInput = true;
+            this.renderer.gammaOutput = true;
+            this.renderer.shadowMap.enabled = true;
+            this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        }
+        
 
         this.scene.fog = new THREE.Fog(0x339ce2, 100, 3000);
         this.renderer.setClearColor(0x339ce2, 1);
@@ -87,17 +93,20 @@ export default class Game {
         dirLight.color.setHSL(0.1, 1, 0.95);
         dirLight.position.set(23, 23, 10);
         dirLight.position.multiplyScalar(10);
-        dirLight.castShadow = true;
-        dirLight.shadow.mapSize.width = 512;
-        dirLight.shadow.mapSize.height = 512; // 2048
-        dirLight.shadow.camera.left = -d;
-        dirLight.shadow.camera.right = d;
-        dirLight.shadow.camera.top = d;
-        dirLight.shadow.camera.bottom = -d;
-
-        dirLight.shadow.camera.far = 3500;
-        dirLight.shadow.bias = -0.0001;
-        dirLight.shadow.darkness = 0.45;
+        if (HAS_SHADOWS) {
+            dirLight.castShadow = true;
+            dirLight.shadow.mapSize.width = 512;
+            dirLight.shadow.mapSize.height = 512; // 2048
+            dirLight.shadow.camera.left = -d;
+            dirLight.shadow.camera.right = d;
+            dirLight.shadow.camera.top = d;
+            dirLight.shadow.camera.bottom = -d;
+    
+            dirLight.shadow.camera.far = 3500;
+            dirLight.shadow.bias = -0.0001;
+            dirLight.shadow.darkness = 0.45;
+        }
+        
         this.scene.add(dirLight);
 
     }
