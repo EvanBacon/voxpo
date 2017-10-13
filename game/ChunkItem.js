@@ -1,6 +1,6 @@
 
 export default class ChunkItem {
-    mesh = undefined;
+    mesh;
     blocks = 0;
     triangles = 0;
     dirty = false;

@@ -1,14 +1,16 @@
 import React from 'react';
 import Weapon from '../enums/Weapon';
-import Settings from '../Settings'
+import Settings from '../Settings';
+
 export default class Objects {
+    chunk;
+    type = 0;
+    hp = 0;
+    weapon = Weapon.shotgun;
+
     constructor(world, phys) {
         this.world = world;
-        this.phys = phys;
-        this.type = 0;
-        this.hp = 0;
-        this.weapon = Weapon.shotgun;
-        this.chunk = undefined;
+        this.phys = phys;    
     }
 
     init = (name, position, chunk) => {
@@ -22,8 +24,8 @@ export default class Objects {
         chunk.type = 1; // 0 = world, 1 = object;
         chunk.blockList = new Array();
 
-        for (var q = 0; q < chunk.blockList.length; q++) {
-            var b = chunk.blockList[q];
+        for (let q = 0; q < chunk.blockList.length; q++) {
+            let b = chunk.blockList[q];
             if (b.x < chunk.fromX) {
                 chunk.fromX = b.x;
             }
@@ -55,12 +57,7 @@ export default class Objects {
         this.chunk = chunk;
     }
 
-    draw = (time, delta) => {
-        this.CheckKeyPress();
-
-    }
-
-    hit = (x, y, z, dmg) => {
-        this.hp -= dmg;
-    }
+    draw = (time, delta) => this.CheckKeyPress();
+    hit = (x, y, z, dmg) => (this.hp -= dmg);
+    
 }

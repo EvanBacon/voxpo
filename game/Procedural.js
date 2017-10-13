@@ -1,5 +1,5 @@
 import React from 'react';
-export default class Proc {
+export default class Procedural {
     constructor(world) {
         this.world = world;
         this.worldSize = 0;
@@ -124,7 +124,7 @@ export default class Proc {
         }
     };
 
-    Mushroom = () => {
+    mushroom = () => {
         var pos = this.getRandomPoint();
         var stemHeight = this.landHeight;
         var base = stemHeight + 8;
@@ -202,8 +202,8 @@ export default class Proc {
         //drawSphere(_x, top, _z, 40, 12, 40, 26571);
     };
 
-    // Proc.prototype.Block = function(size, height) {
-    //     var pos = this.getRandomPoint();
+    // block = (size, height) => {
+    //     const pos = this.getRandomPoint();
     //     for(var x = 0; x < size; x++) {
     //         for(var z = 0; z < size; z++) {
     //             for(var y = this.landHeight; y < this.landHeight+height; y++) {
@@ -217,7 +217,7 @@ export default class Proc {
         return Math.round(min + Math.random() * (max - min));
     };
 
-    Rock = () => {
+    rock = () => {
         var pos = this.getRandomPoint();
         var w1 = this.getRand(10, 40);
         var w2 = this.getRand(10, 40);
@@ -263,7 +263,7 @@ export default class Proc {
     };
 
 
-    Flower3 = () => {
+    flower3 = () => {
         var pos = this.getRandomPoint();
         var maxZ = 1 + Math.round(Math.random() * 2);
         var zCurrent = 0;
@@ -295,7 +295,7 @@ export default class Proc {
         this.world.addBlock(pos.x + maxZ + 1, height, pos.z, Math.random() > 0.5 ? 10 : 6);
     };
 
-    Flower2 = () => {
+    flower2 = () => {
         var pos = this.getRandomPoint();
         var maxZ = 1 + Math.round(Math.random() * 2);
         var zCurrent = 0;

@@ -10,8 +10,8 @@ String.prototype.bin = function () {
 
 // Decimal to binary string conversion
 Number.prototype.bin = function () {
-    var sign = (this < 0 ? "-" : "");
-    var result = Math.abs(this).toString(2);
+    let sign = (this < 0 ? "-" : "");
+    let result = Math.abs(this).toString(2);
     while (result.length < 32) {
         result = "0" + result;
     }
@@ -51,20 +51,20 @@ export default class World {
 
         // initiate blocks
         this.blocks = new Array();
-        for (var x = 0; x < this.worldSize; x++) {
+        for (let x = 0; x < this.worldSize; x++) {
             this.blocks[x] = new Array();
-            for (var y = 0; y < this.chunkHeight; y++) {
+            for (let y = 0; y < this.chunkHeight; y++) {
                 this.blocks[x][y] = new Array();
-                for (var z = 0; z < this.worldSize; z++) {
+                for (let z = 0; z < this.worldSize; z++) {
                     this.blocks[x][y][z] = 0;
                 }
             }
         }
 
         this.chunks = new Array(this.worldDivBase);
-        for (var x = 0; x < this.worldDivBase; x++) {
+        for (let x = 0; x < this.worldDivBase; x++) {
             this.chunks[x] = new Array(this.worldDivBase);
-            for (var z = 0; z < this.worldDivBase; z++) {
+            for (let z = 0; z < this.worldDivBase; z++) {
                 this.chunks[x][z] = new ChunkItem();
                 this.chunks[x][z].type = 0; // world
                 this.chunks[x][z].fromY = 0;
@@ -76,14 +76,14 @@ export default class World {
                 this.chunks[x][z].x = x;
                 this.chunks[x][z].z = z;
                 if (this.showChunks) {
-                    var mat = new THREE.MeshBasicMaterial({ color: 0xAA4444, wireframe: true });
-                    var geo = new THREE.BoxGeometry(
+                    const mat = new THREE.MeshBasicMaterial({ color: 0xAA4444, wireframe: true });
+                    const geo = new THREE.BoxGeometry(
                         this.chunkBase * this.blockSize,
                         this.chunkHeight * this.blockSize,
                         this.chunkBase * this.blockSize
                     );
 
-                    var mesh = new THREE.Mesh(geo, mat);
+                    const mesh = new THREE.Mesh(geo, mat);
                     mesh.position.x = x * this.blockSize * this.chunkBase + this.chunkBase * this.blockSize / 2;
                     mesh.position.z = z * this.blockSize * this.chunkBase + this.chunkBase * this.blockSize / 2;
                     mesh.position.y = this.blockSize * this.chunkHeight / 2;
@@ -94,17 +94,17 @@ export default class World {
 
         // Add ground plate
         // TOP
-        var col = 0x444444;
-        var geo = new THREE.BoxGeometry(this.blockSize * this.worldSize - 2, 1, this.blockSize * this.worldSize - 7);
-        var mat = new THREE.MeshBasicMaterial({ color: col });
-        var mesh = new THREE.Mesh(geo, mat);
+        let col = 0x444444;
+        let geo = new THREE.BoxGeometry(this.blockSize * this.worldSize - 2, 1, this.blockSize * this.worldSize - 7);
+        let mat = new THREE.MeshBasicMaterial({ color: col });
+        let mesh = new THREE.Mesh(geo, mat);
         mesh.position.set((this.worldSize / 2 - this.chunkBase / 2), -1 / 2 + 1, this.worldSize / 2 - this.chunkBase / 2 + 2);
         mesh.receiveShadow = true;
         this.scene.add(mesh);
         // base
-        var geo = new THREE.BoxGeometry(this.blockSize * this.worldSize - 2, 1000, this.blockSize * this.worldSize - 7);
-        var mat = new THREE.MeshBasicMaterial({ color: col });
-        var mesh = new THREE.Mesh(geo, mat);
+        geo = new THREE.BoxGeometry(this.blockSize * this.worldSize - 2, 1000, this.blockSize * this.worldSize - 7);
+        mat = new THREE.MeshBasicMaterial({ color: col });
+        mesh = new THREE.Mesh(geo, mat);
         mesh.position.set((this.worldSize / 2 - this.chunkBase / 2), -1000 / 2, this.worldSize / 2 - this.chunkBase / 2 + 2);
         this.scene.add(mesh);
 
@@ -122,14 +122,14 @@ export default class World {
     }
 
     placeObject = (x, y, z, chunk) => {
-        for (var i = 0; i < chunk.blockList.length; i++) {
+        for (let i = 0; i < chunk.blockList.length; i++) {
             chunk.mesh.updateMatrixWorld();
-            var b = chunk.blockList[i];
-            var vector = new THREE.Vector3(b.x, b.y, b.z);
+            let b = chunk.blockList[i];
+            let vector = new THREE.Vector3(b.x, b.y, b.z);
             vector.applyMatrix4(chunk.mesh.matrixWorld);
-            var xi = vector.x + this.blockSize * 8 | 0;
-            var yi = vector.y | 0;
-            var zi = vector.z + this.blockSize * 8 | 0;
+            let xi = vector.x + this.blockSize * 8 | 0;
+            let yi = vector.y | 0;
+            let zi = vector.z + this.blockSize * 8 | 0;
             // TBD: Solves some issues with placement.
             if (yi <= 0) {
                 yi = 1;
@@ -138,9 +138,9 @@ export default class World {
                 this.blocks[xi][yi][zi] = b.val;
                 // If player is hit by object, kill him (if the object is larger than 200 blocks)
                 if (chunk.blockList.length > 200) {
-                    var px = (this.player.mesh.position.x + this.blockSize * 8) | 0;
-                    var py = (this.player.mesh.position.y + this.blockSize * 8) | 0;
-                    var pz = (this.player.mesh.position.z + this.blockSize * 8) | 0;
+                    let px = (this.player.mesh.position.x + this.blockSize * 8) | 0;
+                    let py = (this.player.mesh.position.y + this.blockSize * 8) | 0;
+                    let pz = (this.player.mesh.position.z + this.blockSize * 8) | 0;
                     if (px == xi && py == yi && pz == zi) {
                         this.player.die();
                     }
@@ -163,19 +163,19 @@ export default class World {
     explode = (x, y, z, power, onlyExplode) => {
         // remove blocks.
         this.exploded = 1;
-        var pow = power * power;
-        var blockList = new Array();
-        for (var rx = x + power; rx >= x - power; rx--) {
-            for (var rz = z + power; rz >= z - power; rz--) {
-                for (var ry = y + power; ry >= y - power; ry--) {
+        let pow = power * power;
+        let blockList = new Array();
+        for (let rx = x + power; rx >= x - power; rx--) {
+            for (let rz = z + power; rz >= z - power; rz--) {
+                for (let ry = y + power; ry >= y - power; ry--) {
                     val = (rx - x) * (rx - x) + (ry - y) * (ry - y) + (rz - z) * (rz - z);
                     if (val <= pow) {
                         this.removeBlock(rx, ry, rz);
 
                         // TBD: Temp solution for player death...
-                        var px = (this.player.mesh.position.x + this.blockSize * 8) | 0;
-                        var py = (this.player.mesh.position.y - this.blockSize * 8) | 0;
-                        var pz = (this.player.mesh.position.z + this.blockSize * 8) | 0;
+                        let px = (this.player.mesh.position.x + this.blockSize * 8) | 0;
+                        let py = (this.player.mesh.position.y - this.blockSize * 8) | 0;
+                        let pz = (this.player.mesh.position.z + this.blockSize * 8) | 0;
                         if (px == rx && py == ry && pz == rz) {
                             this.player.die();
                         }
@@ -204,11 +204,11 @@ export default class World {
     }
 
     drawStats = () => {
-        var vblocks = 0, blocks = 0;
-        var vtriangles = 0, triangles = 0;
-        var vchunks = 0, chunks = 0;
-        for (var x = 0; x < this.chunks.length; x++) {
-            for (var z = 0; z < this.chunks.length; z++) {
+        let vblocks = 0, blocks = 0;
+        let vtriangles = 0, triangles = 0;
+        let vchunks = 0, chunks = 0;
+        for (let x = 0; x < this.chunks.length; x++) {
+            for (let z = 0; z < this.chunks.length; z++) {
                 if (this.chunks[x][z].mesh != undefined) {
                     if (this.chunks[x][z].mesh.visible) {
                         vblocks += this.chunks[x][z].blocks;
@@ -222,17 +222,21 @@ export default class World {
             }
         }
         // TBD: This should not be here...
-        // var phys_stat = this.phys.Stats();
-        // $('#blockstats').html("[Total] Blocks: " + blocks + " Triangles: " + triangles + " Chunks: " + chunks + "<br>" +
-        //     "[Visible] Blocks: " + vblocks + " Triangles: " + vtriangles + " Chunks: " + vchunks + "<br>" +
-        //     "[Particle Engine] Free: " + phys_stat.free + "/" + phys_stat.total);
-
+        // let phys_stat = this.phys.Stats();
+        const totalBlocks = blocks;
+        console.log("GLOBAL: total blocks", blocks);
+        console.log("GLOBAL: triangles", triangles);
+        console.log("GLOBAL: chunks", chunks);
+        console.log("VISIBLE: blocks", vblocks);
+        console.log("VISIBLE: triangles", vtriangles);
+        console.log("VISIBLE: chunks", vchunks);
+        console.log(`PARTICLES: free: ${phys_stat.free}/${phys_stat.total}` );
     }
 
 
     rebuildDirtyChunks = (buildAll) => {
-        for (var x = 0; x < this.chunks.length; x++) {
-            for (var z = 0; z < this.chunks.length; z++) {
+        for (let x = 0; x < this.chunks.length; x++) {
+            for (let z = 0; z < this.chunks.length; z++) {
                 if (buildAll == 1 || this.chunks[x][z].dirty == true) {
                     this.rebuildChunk(this.chunks[x][z]);
                     //this.rebuildChunk(this.chunks[x][z].fromX, this.chunks[x][z].fromZ);
@@ -253,7 +257,7 @@ export default class World {
     }
 
     componentToHex = (c) => {
-        var hex = c.toString(16);
+        let hex = c.toString(16);
         return hex.length == 1 ? "0" + hex : hex;
     }
 
@@ -280,13 +284,13 @@ export default class World {
 
 
     removeHangingBlocks = (blocks) => {
-        var newChunks = new Array();
-        var removeBlocks = new Array();
-        var all = new Array();
-        for (var i = 0; i < blocks.length; i++) {
-            var p = blocks[i];
+        let newChunks = new Array();
+        let removeBlocks = new Array();
+        let all = new Array();
+        for (let i = 0; i < blocks.length; i++) {
+            let p = blocks[i];
             //this.blocks[p.x][p.y][p.z] = (25 & 0xFF) << 24 | (255 & 0xFF) << 16 | (0 & 0xFF) << 8 | this.blocks[p.x][p.y][p.z] & 0xFF;
-            var ff = this.doFloodFill(p);
+            let ff = this.doFloodFill(p);
             all.push(ff.all);
             if (ff.result != true) {
                 if (ff.vals.length == 0) {
@@ -300,8 +304,8 @@ export default class World {
             }
         }
 
-        for (var m = 0; m < newChunks.length; m++) {
-            var ff = newChunks[m];
+        for (let m = 0; m < newChunks.length; m++) {
+            let ff = newChunks[m];
             // create chunk 
             const chunk = new ChunkItem();
             chunk.dirty = true;
@@ -311,8 +315,8 @@ export default class World {
             chunk.type = Chunk.ff;
             chunk.blockList = new Array();
 
-            for (var q = 0; q < ff.vals.length; q++) {
-                var b = ff.vals[q];
+            for (let q = 0; q < ff.vals.length; q++) {
+                let b = ff.vals[q];
                 // we need to reset the values before we set the value in the blockList for the mesh.
                 this.blocks[b.x][b.y][b.z] &= ~(1 << 5);
                 this.blocks[b.x][b.y][b.z] &= ~(1 << 6);
@@ -353,11 +357,11 @@ export default class World {
             this.phys.createMeshBlock(chunk);
         }
 
-        for (var m = 0; m < removeBlocks.length; m++) {
-            var ff = removeBlocks[m];
+        for (let m = 0; m < removeBlocks.length; m++) {
+            let ff = removeBlocks[m];
             // remove parts that are very small.
-            for (var q = 0; q < ff.vals.length; q++) {
-                var b = ff.vals[q];
+            for (let q = 0; q < ff.vals.length; q++) {
+                let b = ff.vals[q];
                 //            this.blocks[b.x][b.y][b.z] = 0;
                 this.removeBlock(b.x, b.y, b.z);
                 //              this.blocks[b.x][b.y][b.z] = (5 & 0xFF) << 24 | (255 & 0xFF) << 16 | (2 & 0xFF) << 8 | this.blocks[b.x][b.y][b.z] & 0xFF;
@@ -366,9 +370,9 @@ export default class World {
         }
 
         // Clears AFTER we have built the chunks where 0x20/0x40 are used.
-        for (var i = 0; i < all.length; i++) {
-            for (var n = 0; n < all[i].length; n++) {
-                var b = all[i][n];
+        for (let i = 0; i < all.length; i++) {
+            for (let n = 0; n < all[i].length; n++) {
+                let b = all[i][n];
                 this.blocks[b.x][b.y][b.z] &= ~(1 << 5);
                 this.blocks[b.x][b.y][b.z] &= ~(1 << 6);
             }
@@ -382,7 +386,7 @@ export default class World {
             return true;
         }
 
-        var left = 0, right = 0, above = 0, front = 0, back = 0, below = 0;
+        let left = 0, right = 0, above = 0, front = 0, back = 0, below = 0;
         if (y > 0) {
             if ((this.blocks[x][y - 1][z] >> 8) != 0) {
                 below = 1;
@@ -421,21 +425,21 @@ export default class World {
     }
 
     doFloodFill = (start) => {
-        // var COLOR1 = lfsr.rand()*255;
-        // var COLOR2 = lfsr.rand()*255;
-        // var COLOR3 = lfsr.rand()*255;
-        var curr = 0x20;
-        var stack = new Array();
-        var result = new Array();
+        // let COLOR1 = lfsr.rand()*255;
+        // let COLOR2 = lfsr.rand()*255;
+        // let COLOR3 = lfsr.rand()*255;
+        const curr = 0x20;
+        let stack = new Array();
+        let result = new Array();
         stack.push(start);
-        var all = new Array();
+        let all = new Array();
 
         if ((start & curr) != 0) {
             return { "result": true, "vals": result, "all": all };
         }
 
         while (stack.length != 0) {
-            var b = stack.pop();
+            let b = stack.pop();
             all.push(b);
             if (!this.isWithinWorld(b.x, b.y, b.z)) {
                 continue;
@@ -476,13 +480,13 @@ export default class World {
     }
 
     smokeBlock = (x, y, z) => {
-        var block = this.phys.get();
+        const block = this.phys.get();
         if (block != undefined) {
             // Random colors
-            var color = lfsr.rand() * 155 | 0;
-            var r = color;
-            var g = color;
-            var b = color;
+            let color = lfsr.rand() * 155 | 0;
+            const r = color;
+            const g = color;
+            const b = color;
             block.gravity = -2;
             block.create(x - this.blockSize * 8,
                 y + this.blockSize,
@@ -496,12 +500,12 @@ export default class World {
     }
 
     explosionBlock = (x, y, z) => {
-        var block = this.phys.get();
+        const block = this.phys.get();
         if (block != undefined) {
             // Random colors
-            var r = 255;
-            var g = 100 + (lfsr.rand() * 155 | 0);
-            var b = 0;
+            const r = 255;
+            const g = 100 + (lfsr.rand() * 155 | 0);
+            const b = 0;
             block.create(x - this.blockSize * 8,
                 y + this.blockSize,
                 z - this.blockSize * 8,
@@ -520,17 +524,17 @@ export default class World {
             return;
         }
 
-        var chunk = this.getChunk(x, z);
+        let chunk = this.getChunk(x, z);
         if (chunk != undefined) {
             chunk.blocks--;
             chunk.dirty = true;
 
-            var block = this.phys.get();
+            let block = this.phys.get();
             if (block != undefined) {
                 if (lfsr.rand() < 0.25) {
-                    var r = (this.blocks[x][y][z] >> 24) & 0xFF;
-                    var g = (this.blocks[x][y][z] >> 16) & 0xFF;
-                    var b = (this.blocks[x][y][z] >> 8) & 0xFF;
+                    let r = (this.blocks[x][y][z] >> 24) & 0xFF;
+                    let g = (this.blocks[x][y][z] >> 16) & 0xFF;
+                    let b = (this.blocks[x][y][z] >> 8) & 0xFF;
                     block.create(x - this.blockSize * 8,
                         y + this.blockSize,
                         z - this.blockSize * 8,
@@ -545,13 +549,13 @@ export default class World {
     }
 
     addBlock = (x, y, z, color) => {
-        var size = 1 / this.blockSize;
+        let size = 1 / this.blockSize;
 
         if (x < 0 || y < 0 || z < 0 || x > this.worldSize - 1 || y > this.chunkHeight - 1 || z > this.worldSize - 1) {
             return;
         }
 
-        var chunk = this.getChunk(x, z);
+        let chunk = this.getChunk(x, z);
         if (this.blocks[x][y][z] == 0) {
             chunk.blocks += size;
             this.blocks[x][y][z] = (color[0] & 0xFF) << 24 | (color[1] & 0xFF) << 16 | (color[2] & 0xFF) << 8 | 0 & 0xFF;
@@ -559,28 +563,23 @@ export default class World {
         }
     }
 
-    sameColor = (block1, block2) => {
-        if (((block1 >> 8) & 0xFFFFFF) == ((block2 >> 8) & 0xFFFFFF) && block1 != 0 && block2 != 0) {
-            return true;
-        }
-        return false;
-    }
+    sameColor = (block1, block2) => (((block1 >> 8) & 0xFFFFFF) == ((block2 >> 8) & 0xFFFFFF) && block1 != 0 && block2 != 0);
 
     // Given world position
     rebuildChunk = (chunk) => {
-        var sides = 0;
+        let sides = 0;
 
-        var vertices = [];
-        var colors = [];
+        let vertices = [];
+        let colors = [];
 
         // Block structure
         // BLOCK: [R-color][G-color][B-color][0][00][back_left_right_above_front]
         //           8bit    8bit     8it    1bit(unused)  2bit(floodfill)     5bit(faces)
 
         // Reset faces
-        for (var x = chunk.fromX; x < chunk.toX; x++) {
-            for (var y = chunk.fromY; y < chunk.toY; y++) {
-                for (var z = chunk.fromZ; z < chunk.toZ; z++) {
+        for (let x = chunk.fromX; x < chunk.toX; x++) {
+            for (let y = chunk.fromY; y < chunk.toY; y++) {
+                for (let z = chunk.fromZ; z < chunk.toZ; z++) {
                     if (this.blocks[x][y][z] != 0) {
                         // TBD: Hmmm...should work with a AND op? Need some brain to this whine.
                         this.blocks[x][y][z] &= ~(1 << 0)
@@ -594,9 +593,9 @@ export default class World {
             }
         }
 
-        for (var x = chunk.fromX; x < chunk.toX; x++) {
-            for (var y = chunk.fromY; y < chunk.toY; y++) {
-                for (var z = chunk.fromZ; z < chunk.toZ; z++) {
+        for (let x = chunk.fromX; x < chunk.toX; x++) {
+            for (let y = chunk.fromY; y < chunk.toY; y++) {
+                for (let z = chunk.fromZ; z < chunk.toZ; z++) {
                     if (chunk.type == Chunk.ff) {
                         // make sure we only use blocks that we should build as mesh. (floodfill only)
                         if ((this.blocks[x][y][z] & 0x20) == 0 && (this.blocks[x][y][z] & 0x40) == 0) {
@@ -607,7 +606,7 @@ export default class World {
                         continue; // Skip empty blocks
                     }
                     // Check if hidden
-                    var left = 0, right = 0, above = 0, front = 0, back = 0;
+                    let left = 0, right = 0, above = 0, front = 0, back = 0;
                     if (z > 0) {
                         if (this.blocks[x][y][z - 1] != 0) {
                             back = 1;
@@ -651,19 +650,19 @@ export default class World {
                     if (!above) {
                         // Get above (0010)
                         if ((this.blocks[x][y][z] & 0x2) == 0) {
-                            var maxX = 0;
-                            var maxZ = 0;
-                            var end = 0;
+                            let maxX = 0;
+                            let maxZ = 0;
+                            let end = 0;
 
-                            for (var x_ = x; x_ < chunk.toX; x_++) {
+                            for (let x_ = x; x_ < chunk.toX; x_++) {
                                 // Check not drawn + same color
                                 if ((this.blocks[x_][y][z] & 0x2) == 0 && this.sameColor(this.blocks[x_][y][z], this.blocks[x][y][z])) {
                                     maxX++;
                                 } else {
                                     break;
                                 }
-                                var tmpZ = 0;
-                                for (var z_ = z; z_ < chunk.toZ; z_++) {
+                                let tmpZ = 0;
+                                for (let z_ = z; z_ < chunk.toZ; z_++) {
                                     if ((this.blocks[x_][y][z_] & 0x2) == 0 && this.sameColor(this.blocks[x_][y][z_], this.blocks[x][y][z])) {
                                         tmpZ++;
                                     } else {
@@ -674,8 +673,8 @@ export default class World {
                                     maxZ = tmpZ;
                                 }
                             }
-                            for (var x_ = x; x_ < x + maxX; x_++) {
-                                for (var z_ = z; z_ < z + maxZ; z_++) {
+                            for (let x_ = x; x_ < x + maxX; x_++) {
+                                for (let z_ = z; z_ < z + maxZ; z_++) {
                                     this.blocks[x_][y][z_] = this.blocks[x_][y][z_] | 0x2;
                                 }
                             }
@@ -691,7 +690,7 @@ export default class World {
                             vertices.push([x * this.blockSize - this.blockSize, y * this.blockSize, z * this.blockSize - this.blockSize]);
 
                             sides += 6;
-                            for (var n = 0; n < 6; n++) {
+                            for (let n = 0; n < 6; n++) {
                                 colors.push([((this.blocks[x][y][z] >> 24) & 0xFF),
                                 ((this.blocks[x][y][z] >> 16) & 0xFF),
                                 ((this.blocks[x][y][z] >> 8) & 0xFF)
@@ -702,18 +701,18 @@ export default class World {
                     if (!back) {
                         // back  10000
                         if ((this.blocks[x][y][z] & 0x10) == 0) {
-                            var maxX = 0;
-                            var maxY = 0;
+                            let maxX = 0;
+                            let maxY = 0;
 
-                            for (var x_ = x; x_ < chunk.toX; x_++) {
+                            for (let x_ = x; x_ < chunk.toX; x_++) {
                                 // Check not drawn + same color
                                 if ((this.blocks[x_][y][z] & 0x10) == 0 && this.sameColor(this.blocks[x_][y][z], this.blocks[x][y][z])) {
                                     maxX++;
                                 } else {
                                     break;
                                 }
-                                var tmpY = 0;
-                                for (var y_ = y; y_ < chunk.toY; y_++) {
+                                let tmpY = 0;
+                                for (let y_ = y; y_ < chunk.toY; y_++) {
                                     if ((this.blocks[x_][y_][z] & 0x10) == 0 && this.sameColor(this.blocks[x_][y_][z], this.blocks[x][y][z])) {
                                         tmpY++;
                                     } else {
@@ -724,8 +723,8 @@ export default class World {
                                     maxY = tmpY;
                                 }
                             }
-                            for (var x_ = x; x_ < x + maxX; x_++) {
-                                for (var y_ = y; y_ < y + maxY; y_++) {
+                            for (let x_ = x; x_ < x + maxX; x_++) {
+                                for (let y_ = y; y_ < y + maxY; y_++) {
                                     this.blocks[x_][y_][z] = this.blocks[x_][y_][z] | 0x10;
                                 }
                             }
@@ -740,7 +739,7 @@ export default class World {
                             vertices.push([x * this.blockSize - this.blockSize, y * this.blockSize + (this.blockSize * maxY), z * this.blockSize - this.blockSize]);
 
                             sides += 6;
-                            for (var n = 0; n < 6; n++) {
+                            for (let n = 0; n < 6; n++) {
                                 colors.push([((this.blocks[x][y][z] >> 24) & 0xFF),
                                 ((this.blocks[x][y][z] >> 16) & 0xFF),
                                 ((this.blocks[x][y][z] >> 8) & 0xFF)
@@ -751,18 +750,18 @@ export default class World {
                     if (!front) {
                         // front 0001
                         if ((this.blocks[x][y][z] & 0x1) == 0) {
-                            var maxX = 0;
-                            var maxY = 0;
+                            let maxX = 0;
+                            let maxY = 0;
 
-                            for (var x_ = x; x_ < chunk.toX; x_++) {
+                            for (let x_ = x; x_ < chunk.toX; x_++) {
                                 // Check not drawn + same color
                                 if ((this.blocks[x_][y][z] & 0x1) == 0 && this.sameColor(this.blocks[x_][y][z], this.blocks[x][y][z])) {
                                     maxX++;
                                 } else {
                                     break;
                                 }
-                                var tmpY = 0;
-                                for (var y_ = y; y_ < chunk.toY; y_++) {
+                                let tmpY = 0;
+                                for (let y_ = y; y_ < chunk.toY; y_++) {
                                     if ((this.blocks[x_][y_][z] & 0x1) == 0 && this.sameColor(this.blocks[x_][y_][z], this.blocks[x][y][z])) {
                                         tmpY++;
                                     } else {
@@ -773,8 +772,8 @@ export default class World {
                                     maxY = tmpY;
                                 }
                             }
-                            for (var x_ = x; x_ < x + maxX; x_++) {
-                                for (var y_ = y; y_ < y + maxY; y_++) {
+                            for (let x_ = x; x_ < x + maxX; x_++) {
+                                for (let y_ = y; y_ < y + maxY; y_++) {
                                     this.blocks[x_][y_][z] = this.blocks[x_][y_][z] | 0x1;
                                 }
                             }
@@ -789,7 +788,7 @@ export default class World {
                             vertices.push([x * this.blockSize - this.blockSize, y * this.blockSize - this.blockSize, z * this.blockSize]);
                             vertices.push([x * this.blockSize + (this.blockSize * maxX), y * this.blockSize - this.blockSize, z * this.blockSize]);
                             sides += 6;
-                            for (var n = 0; n < 6; n++) {
+                            for (let n = 0; n < 6; n++) {
                                 colors.push([((this.blocks[x][y][z] >> 24) & 0xFF),
                                 ((this.blocks[x][y][z] >> 16) & 0xFF),
                                 ((this.blocks[x][y][z] >> 8) & 0xFF)
@@ -799,18 +798,18 @@ export default class World {
                     }
                     if (!left) {
                         if ((this.blocks[x][y][z] & 0x8) == 0) {
-                            var maxZ = 0;
-                            var maxY = 0;
+                            let maxZ = 0;
+                            let maxY = 0;
 
-                            for (var z_ = z; z_ < chunk.toZ; z_++) {
+                            for (let z_ = z; z_ < chunk.toZ; z_++) {
                                 // Check not drawn + same color
                                 if ((this.blocks[x][y][z_] & 0x8) == 0 && this.sameColor(this.blocks[x][y][z_], this.blocks[x][y][z])) {
                                     maxZ++;
                                 } else {
                                     break;
                                 }
-                                var tmpY = 0;
-                                for (var y_ = y; y_ < chunk.toY; y_++) {
+                                let tmpY = 0;
+                                for (let y_ = y; y_ < chunk.toY; y_++) {
                                     if ((this.blocks[x][y_][z_] & 0x8) == 0 && this.sameColor(this.blocks[x][y_][z_], this.blocks[x][y][z])) {
                                         tmpY++;
                                     } else {
@@ -821,8 +820,8 @@ export default class World {
                                     maxY = tmpY;
                                 }
                             }
-                            for (var z_ = z; z_ < z + maxZ; z_++) {
-                                for (var y_ = y; y_ < y + maxY; y_++) {
+                            for (let z_ = z; z_ < z + maxZ; z_++) {
+                                for (let y_ = y; y_ < y + maxY; y_++) {
                                     this.blocks[x][y_][z_] = this.blocks[x][y_][z_] | 0x8;
                                 }
                             }
@@ -838,7 +837,7 @@ export default class World {
                             vertices.push([x * this.blockSize - this.blockSize, y * this.blockSize + (this.blockSize * maxY), z * this.blockSize - this.blockSize]);
 
                             sides += 6;
-                            for (var n = 0; n < 6; n++) {
+                            for (let n = 0; n < 6; n++) {
                                 colors.push([((this.blocks[x][y][z] >> 24) & 0xFF),
                                 ((this.blocks[x][y][z] >> 16) & 0xFF),
                                 ((this.blocks[x][y][z] >> 8) & 0xFF)
@@ -848,18 +847,18 @@ export default class World {
                     }
                     if (!right) {
                         if ((this.blocks[x][y][z] & 0x4) == 0) {
-                            var maxZ = 0;
-                            var maxY = 0;
+                            let maxZ = 0;
+                            let maxY = 0;
 
-                            for (var z_ = z; z_ < chunk.toZ; z_++) {
+                            for (let z_ = z; z_ < chunk.toZ; z_++) {
                                 // Check not drawn + same color
                                 if ((this.blocks[x][y][z_] & 0x4) == 0 && this.sameColor(this.blocks[x][y][z_], this.blocks[x][y][z])) {
                                     maxZ++;
                                 } else {
                                     break;
                                 }
-                                var tmpY = 0;
-                                for (var y_ = y; y_ < chunk.toY; y_++) {
+                                let tmpY = 0;
+                                for (let y_ = y; y_ < chunk.toY; y_++) {
                                     if ((this.blocks[x][y_][z_] & 0x4) == 0 && this.sameColor(this.blocks[x][y_][z_], this.blocks[x][y][z])) {
                                         tmpY++;
                                     } else {
@@ -870,8 +869,8 @@ export default class World {
                                     maxY = tmpY;
                                 }
                             }
-                            for (var z_ = z; z_ < z + maxZ; z_++) {
-                                for (var y_ = y; y_ < y + maxY; y_++) {
+                            for (let z_ = z; z_ < z + maxZ; z_++) {
+                                for (let y_ = y; y_ < y + maxY; y_++) {
                                     this.blocks[x][y_][z_] = this.blocks[x][y_][z_] | 0x4;
                                 }
                             }
@@ -887,7 +886,7 @@ export default class World {
                             vertices.push([x * this.blockSize, y * this.blockSize + (this.blockSize * maxY), z * this.blockSize - this.blockSize]);
 
                             sides += 6;
-                            for (var n = 0; n < 6; n++) {
+                            for (let n = 0; n < 6; n++) {
                                 colors.push([((this.blocks[x][y][z] >> 24) & 0xFF),
                                 ((this.blocks[x][y][z] >> 16) & 0xFF),
                                 ((this.blocks[x][y][z] >> 8) & 0xFF)
@@ -905,15 +904,15 @@ export default class World {
         chunk.triangles = vertices.length / 3;
 
         // draw chunk
-        var geometry = new THREE.BufferGeometry();
-        var v = new THREE.BufferAttribute(new Float32Array(vertices.length * 3), 3);
-        for (var i = 0; i < vertices.length; i++) {
+        let geometry = new THREE.BufferGeometry();
+        let v = new THREE.BufferAttribute(new Float32Array(vertices.length * 3), 3);
+        for (let i = 0; i < vertices.length; i++) {
             v.setXYZ(i, vertices[i][0], vertices[i][1], vertices[i][2]);
         }
         geometry.addAttribute('position', v);
 
-        var c = new THREE.BufferAttribute(new Float32Array(colors.length * 3), 3);
-        for (var i = 0; i < colors.length; i++) {
+        let c = new THREE.BufferAttribute(new Float32Array(colors.length * 3), 3);
+        for (let i = 0; i < colors.length; i++) {
             c.setXYZW(i, colors[i][0] / 255, colors[i][1] / 255, colors[i][2] / 255, 1);
         }
         geometry.addAttribute('color', c);

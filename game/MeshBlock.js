@@ -55,7 +55,7 @@ export default class MeshBlock {
         let new_ay = fy / this.mass;
         this.avg_ay = 0.5 * (new_ay + this.avg_ay);
         this.vy -= this.avg_ay * delta;
-    };
+    }
 
     create = (chunk) => {
 
@@ -71,6 +71,6 @@ export default class MeshBlock {
                 this.off = 1;
             }
         }
-    };
+    }
 }
 

@@ -5,7 +5,7 @@ import Type from '../enums/Type';
 import World from './World';
 import Phys from './Phys';
 import Player from './Player';
-import Proc from './Proc';
+import Procedural from './Procedural';
 import Expo from 'expo';
 import ExpoTHREE from 'expo-three';
 import lfsr from './utils'
@@ -135,7 +135,7 @@ export default class Game {
 
         this.phys.player = this.player;
 
-        // this.proc = new Proc(this.world);
+        // this.procedural = new Procedural(this.world);
 
         this.world.init();
         this.phys.init();

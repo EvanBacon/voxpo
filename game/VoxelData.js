@@ -4,7 +4,6 @@ export default class VoxelData {
     z;
     color;
     constructor() {
-
     }
 
     create = (buffer, i, subSample) => {

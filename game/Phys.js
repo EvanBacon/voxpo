@@ -17,13 +17,11 @@ export default class Phys {
         this.scene = scene;
         this.world = world;
         this.player = player;
-        
     }
 
     init = () => {
-        let b;
         for (let i = 0; i < this.size; i++) {
-            b = new PhysicsBlock(this.scene, this.world, this.player, this);
+            const b = new PhysicsBlock(this.scene, this.world, this.player, this);
             b.init();
             this.blocks.push(b);
         }
@@ -35,6 +33,7 @@ export default class Phys {
                 this.blocks[i].draw(time, delta);
             }
         }
+
         for (let i = 0; i < this.meshes.length; i++) {
             if (this.meshes[i].remove == 1) {
                 this.scene.remove(this.meshes[i].mesh);
@@ -66,14 +65,17 @@ export default class Phys {
         }
     }
 
-    Stats = () => {
+    stats = () => {
         let free = 0;
         for (let i = 0; i < this.blocks.length; i++) {
             if (this.blocks[i].active == 0) {
                 free++;
             }
         }
-        return { free, total: this.size };
+        return {
+            free,
+            total: this.size
+        };
     }
 
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Image, StatusBar, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Image, PanResponder, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 import Main from './Main';
 import Expo from 'expo';
 import TouchableBounce from 'react-native/Libraries/Components/Touchable/TouchableBounce';
@@ -15,7 +15,7 @@ export default class App extends React.Component {
   state = { assetsLoaded: false }
 
   async componentWillMount() {
-    await this._preload();
+    // await this._preload();
     this.setState({ assetsLoaded: true })
   }
   async _preload() {
@@ -49,14 +49,15 @@ export default class App extends React.Component {
       right: "rocket",
       bottom: "die",
     }
+    
     return (
       <View style={{ flex: 1 }}>
         <StatusBar hidden={false} />
-        <Main onLoaded={game => this.setState({ loaded: true, game })} />
+        {<Main onLoaded={game => this.setState({ loaded: true, game })} />}
         <Dpad onPress={pressIn} onPressOut={pressOut} style={{ position: 'absolute', bottom: 8, left: 8 }} />
         <Dpad buttonMap={rightButtonMap} style={{ position: 'absolute', bottom: 8, right: 8 }} onPress={pressIn} onPressOut={pressOut} />
-        {!this.state.loaded && <Loading />}
-
+        
+{!this.state.loaded && <Loading />}
       </View>
     );
   }
@@ -74,11 +75,17 @@ class Loading extends React.PureComponent {
 }
 
 class Button extends React.PureComponent {
+  _panResponder = PanResponder.create({
+    onPanResponderTerminationRequest: () => false,
+    onStartShouldSetPanResponderCapture: () => false,
+  });
+
   render() {
     const size = 50 - 4
     const { style, onPress, id, onPressOut } = this.props
+    // {...this._panResponder.panHandlers}
     return (
-      <TouchableOpacity style={[style, { padding: 2 }]} onPressOut={_ => onPressOut(id)} onPressIn={_ => { onPress(id) }}>
+      <TouchableOpacity  style={[style, { padding: 2 }]} onPressOut={_ => onPressOut(id)} onPressIn={_ => { onPress(id) }}>
         <View style={{ width: size, height: size, backgroundColor: 'rgba(128, 128, 128, 0.6)', borderRadius: 3 }}>
         </View>
       </TouchableOpacity>
@@ -96,6 +103,7 @@ export class Dpad extends React.Component {
       bottom: DirectionType.backward,
     }
   }
+
   render() {
     const { onPress, onPressOut, style, buttonMap } = this.props
     return (
