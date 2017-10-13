@@ -95,13 +95,16 @@ export default class Player {
             // this.shootRocketChunk,
             // this.shootShotgunChunk
         ];
-        for (let i = 0; i < chunks.length; i++) {
-            let mesh = chunks[i].mesh;
-            mesh.position.set(0, 0, 0);
-            mesh.rotation.set(0, 0, 0);
-            mesh.geometry.center();
-            mesh.geometry.verticesNeedUpdate = true;
+        if (chunks) {
+            for (let i = 0; i < chunks.length; i++) {
+                let mesh = chunks[i].mesh;
+                mesh.position.set(0, 0, 0);
+                mesh.rotation.set(0, 0, 0);
+                mesh.geometry.center();
+                mesh.geometry.verticesNeedUpdate = true;
+            }
         }
+        
         this.switchModel(Model.stand);
         this.mesh.position.set(153, 21, 55);
 
@@ -261,10 +264,10 @@ export default class Player {
 
     touchMove = (event) => {
         // let event = jevent.originalEvent;
-        let movementX = event.locationX;
-        let movementZ = event.locationY;
-        let x = movementX * 0.0001;
-        let z = movementZ * 0.0001;
+        let movementX = (event.locationX/window.innerWidth) - 0.5
+        let movementZ = (event.locationY/window.innerHeight) - 0.5
+        let x = movementX * 0.01;
+        let z = movementZ * 0.01;
 
         if (this.mesh != undefined) {
             let axis = new THREE.Vector3(0, 1, 0);

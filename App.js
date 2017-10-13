@@ -4,9 +4,28 @@ import Main from './Main';
 import Expo from 'expo';
 import TouchableBounce from 'react-native/Libraries/Components/Touchable/TouchableBounce';
 
+import cacheAssetsAsync from './util/cacheAssetsAsync';
+import arrayFromObject from './util/arrayFromObject';
+
+import Maps from './Maps'
+import Models from './Models'
 export default class App extends React.Component {
   state = {}
+
+  async componentWillMount() {
+    await _preload();
+    this.setState({ assetsLoaded: true })
+  }
+  async _preload() {
+    return await cacheAssetsAsync({
+      files: arrayFromObject(Models).concat(arrayFromObject(Maps))
+    })
+  }
+
   render() {
+    if (!this.state.assetsLoaded) {
+      return (<Expo.AppLoading />);
+    }
     const pressIn = direction => {
       if (this.state.game) {
         this.state.game.player.controls[direction] = true;
@@ -44,9 +63,9 @@ export default class App extends React.Component {
 class Loading extends React.PureComponent {
   render() {
     return (
-      <Expo.LinearGradient style={StyleSheet.flatten([StyleSheet.absoluteFill, {flex: 1, justifyContent: 'center', alignItems: 'center'}])} colors={['#4c669f', '#3b5998', '#056ecf']}>
-        <TouchableBounce style={{aspectRatio: 1, height: "60%", alignItems: 'center', justifyContent: 'center'}}><Image style={{aspectRatio: 1, height: "100%", resizeMode: 'contain'}} source={require('./assets/icons/loading-icon.png')}/></TouchableBounce>
-        </Expo.LinearGradient>
+      <Expo.LinearGradient style={StyleSheet.flatten([StyleSheet.absoluteFill, { flex: 1, justifyContent: 'center', alignItems: 'center' }])} colors={['#4c669f', '#3b5998', '#056ecf']}>
+        <TouchableBounce style={{ aspectRatio: 1, height: "60%", alignItems: 'center', justifyContent: 'center' }}><Image style={{ aspectRatio: 1, height: "100%", resizeMode: 'contain' }} source={require('./assets/icons/loading-icon.png')} /></TouchableBounce>
+      </Expo.LinearGradient>
     )
   }
 }
