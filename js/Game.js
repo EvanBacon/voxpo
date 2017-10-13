@@ -11,9 +11,9 @@ import ExpoTHREE from 'expo-three';
 import lfsr from './utils'
 import Models from '../Models';
 import Maps from '../Maps';
+import Settings from '../Settings';
 
 
-const HAS_SHADOWS = false;
 export default class Game {
 
     scene;
@@ -51,9 +51,6 @@ export default class Game {
 
     }
 
-    //==========================================================
-    // initScene
-    //==========================================================
     setupScene = () => {
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera(20, this.aspect, this.near, this.far);
@@ -63,21 +60,22 @@ export default class Game {
     setupRenderer = () => {
         const { innerWidth: width, innerHeight: height, devicePixelRatio: scale } = window;
 
-        this.renderer = ExpoTHREE.createRenderer({ gl: this.gl, antialias: true });
+        this.renderer = ExpoTHREE.createRenderer({ gl: this.gl, antialias: Settings.antialias });
         this.renderer.setPixelRatio(scale);
         this.renderer.setSize(width, height);
-        if (HAS_SHADOWS) {
+        if (Settings.shadows) {
             this.renderer.gammaInput = true;
             this.renderer.gammaOutput = true;
             this.renderer.shadowMap.enabled = true;
             this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         }
-        
 
-        this.scene.fog = new THREE.Fog(0x339ce2, 100, 3000);
-        this.renderer.setClearColor(0x339ce2, 1);
+
+        this.scene.fog = new THREE.Fog(Settings.fog, 100, 3000);
+        this.renderer.setClearColor(Settings.fog, 1);
 
     }
+
     setupLights = () => {
         const ambientLight = new THREE.AmbientLight(0xEEB1C6);
         this.scene.add(ambientLight);
@@ -93,7 +91,7 @@ export default class Game {
         dirLight.color.setHSL(0.1, 1, 0.95);
         dirLight.position.set(23, 23, 10);
         dirLight.position.multiplyScalar(10);
-        if (HAS_SHADOWS) {
+        if (Settings.shadows) {
             dirLight.castShadow = true;
             dirLight.shadow.mapSize.width = 512;
             dirLight.shadow.mapSize.height = 512; // 2048
@@ -101,15 +99,16 @@ export default class Game {
             dirLight.shadow.camera.right = d;
             dirLight.shadow.camera.top = d;
             dirLight.shadow.camera.bottom = -d;
-    
+
             dirLight.shadow.camera.far = 3500;
             dirLight.shadow.bias = -0.0001;
             dirLight.shadow.darkness = 0.45;
         }
-        
+
         this.scene.add(dirLight);
 
     }
+
     setupRollover = () => {
 
         // Voxel paint
@@ -140,10 +139,8 @@ export default class Game {
 
         this.world.init();
         this.phys.init();
-        
+
         await this.setupVox();
-
-
 
         // this.controls = new THREE.OrbitControls(this.camera);
     }
@@ -283,7 +280,6 @@ export default class Game {
                 console.warn("Model Failed To Load")
                 console.warn({ error });
             }
-
         }
     }
 
@@ -357,9 +353,9 @@ export default class Game {
         this.frameDelta -= this.invMaxFps;
         this.world.draw(time, delta);
 
-        this.renderWaterfall(delta);
+        // this.renderWaterfall(delta);
     }
-    
+
     update = (delta) => {
         let time = Date.now() * 10;
         this.frameDelta += delta;
