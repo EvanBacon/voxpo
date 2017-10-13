@@ -1,13 +1,13 @@
 {
   "expo": {
-    "name": "voxpo",
-    "description": "An empty new project",
+    "name": "Voxpo",
+    "description": "A cool chunky world!",
     "slug": "voxpo",
-    "privacy": "public",
+    "privacy": "unlisted",
     "sdkVersion": "21.0.0",
     "version": "1.0.0",
     "orientation": "landscape",
-    "primaryColor": "#cccccc",
+    "primaryColor": "#056ecf",
     "icon": "./assets/icons/app-icon.png",
     "loading": {
       "icon": "./assets/icons/loading-icon.png"

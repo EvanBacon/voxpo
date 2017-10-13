@@ -539,7 +539,7 @@ export default class Player {
             }
             this.run();
         }
-        if (this.controls.space) {
+        if (this.controls.up) {
             this.jumpTime = 0;
             this.mesh.translateY(this.moveDistance);
             let x = Math.round(this.mesh.position.x + 6);

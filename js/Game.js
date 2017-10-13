@@ -97,7 +97,7 @@ export default class Game {
             // require("../objects/player_run2_shotgun.vox"),
             // require("../objects/player_shoot_shotgun.vox"),
             // require("../objects/player_fall_shotgun.vox"),
-            require("../maps/monu9_test2.vox"),
+            require("../maps/monu10.vox"),
         ].map(filename => {
             const asset = Expo.Asset.fromModule(filename);
             return asset.downloadAsync();
@@ -289,7 +289,7 @@ export default class Game {
             //     retVal: (t, chunk) => this.player.fallShotgunChunk = chunk
             // },
             {
-                res: require("../maps/monu9_test2.vox"),
+                res: require("../maps/monu10.vox"),
                 name: "Map1",
                 type: Type.map,
                 retVal: (t, chunk) => {
