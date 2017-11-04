@@ -1,24 +1,3 @@
 export default {
-	// "T-Rex": require(`./assets/models/T-Rex.vox`),
-	// "expo": require(`./assets/models/expo.vox`),
-	// "grenade": require(`./assets/models/grenade.vox`),
-	// "player_fall": require(`./assets/models/player_fall.vox`),
-	// "player_fall_shotgun": require(`./assets/models/player_fall_shotgun.vox`),
-	// "player_jump": require(`./assets/models/player_jump.vox`),
-	// "player_fall_rocket": require(`./assets/models/player_fall_rocket.vox`),
-	// "player_jump_rocket": require(`./assets/models/player_jump_rocket.vox`),
-	// "player_jump_shotgun": require(`./assets/models/player_jump_shotgun.vox`),
-	// "player_run1": require(`./assets/models/player_run1.vox`),
-	// "player_run1_rocket": require(`./assets/models/player_run1_rocket.vox`),
-	// "player_run1_shotgun": require(`./assets/models/player_run1_shotgun.vox`),
-	// "player_run2": require(`./assets/models/player_run2.vox`),
-	// "player_run2_rocket": require(`./assets/models/player_run2_rocket.vox`),
-	// "player_run2_shotgun": require(`./assets/models/player_run2_shotgun.vox`),
-	// "player_shoot_rocket": require(`./assets/models/player_shoot_rocket.vox`),
-	// "player_shoot_shotgun": require(`./assets/models/player_shoot_shotgun.vox`),
-	"player_stand": require(`./assets/models/player_stand.vox`),
-	// "player_stand_rocket": require(`./assets/models/player_stand_rocket.vox`),
-	// "player_stand_shotgun": require(`./assets/models/player_stand_shotgun.vox`),
-	// "rocket": require(`./assets/models/rocket.vox`),
-	// "shotgun": require(`./assets/models/shotgun.vox`)
+  player_stand: require(`./assets/models/player_stand.vox`)
 };

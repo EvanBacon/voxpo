@@ -13,7 +13,7 @@ const AR = false;
 
 const { PanGestureHandler, State } = Expo.DangerZone.GestureHandler;
 
-class App extends React.Component {
+export default class App extends React.Component {
   shouldComponentUpdate(nextProps, nextState) {
     const { props, state } = this;
     return false;
@@ -21,12 +21,6 @@ class App extends React.Component {
   _onHandlerStateChange = event => {
     if (event.nativeEvent.oldState === State.ACTIVE) {
       this.game.player.touchEnd();
-      // this._lastOffset.x += event.nativeEvent.translationX;
-      // this._lastOffset.y += event.nativeEvent.translationY;
-      // this._translateX.setOffset(this._lastOffset.x);
-      // this._translateX.setValue(0);
-      // this._translateY.setOffset(this._lastOffset.y);
-      // this._translateY.setValue(0);
     }
   };
 
@@ -67,5 +61,3 @@ class App extends React.Component {
     this.game.animate(delta);
   };
 }
-
-export default App;

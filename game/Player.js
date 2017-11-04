@@ -5,7 +5,8 @@ import Direction from "../enums/Direction";
 import Physics from "../enums/Physics";
 import lfsr from "./utils";
 import Settings from "../Settings";
-
+import { Dimensions } from "react-native";
+const { width, height } = Dimensions.get("window");
 export default class Player {
   controls = {};
   name = "James Ide";
@@ -73,26 +74,7 @@ export default class Player {
     this.name = name;
     this.hp = Settings.max_hp;
 
-    let chunks = [
-      // this.run1Chunk,
-      // this.run2Chunk,
-      // this.run1RocketChunk,
-      // this.run2RocketChunk,
-      // this.run1ShotgunChunk,
-      // this.run2ShotgunChunk,
-      // this.jumpChunk,
-      // this.jumpRocketChunk,
-      // this.jumpShotgunChunk,
-      this.standChunk
-      // this.standRocketChunk,
-      // this.standShotgunChunk,
-      // this.fallChunk,
-      // this.fallRocketChunk,
-      // this.fallShotgunChunk,
-      // this.shootChunk,
-      // this.shootRocketChunk,
-      // this.shootShotgunChunk
-    ];
+    let chunks = [this.standChunk];
     if (chunks) {
       for (let i = 0; i < chunks.length; i++) {
         let mesh = chunks[i].mesh;
@@ -137,114 +119,16 @@ export default class Player {
       rot = new THREE.Vector3(0, 0, 0);
     }
 
-    // switch (model) {
-    //     case Model.jump:
-    //         switch (this.weapon) {
-    //             case Weapon.shotgun:
-    //                 // this.mesh = this.jumpShotgunChunk.mesh;
-    //                 // this.chunk = this.jumpShotgunChunk;
-    //                 break;
-    //             case Weapon.rocket:
-    //                 // this.mesh = this.jumpRocketChunk.mesh;
-    //                 // this.chunk = this.jumpRocketChunk;
-    //                 break;
-    //             case Weapon.none:
-    //                 // this.mesh = this.jumpChunk.mesh;
-    //                 // this.chunk = this.jumpChunk;
-    //                 break;
-    //         }
-    //         break;
-    //     case Model.stand:
-    //         switch (this.weapon) {
-    //             case Weapon.shotgun:
-    //                 // this.mesh = this.standShotgunChunk.mesh;
-    //                 // this.chunk = this.standShotgunChunk;
-    //                 break;
-    //             case Weapon.rocket:
-    //                 // this.mesh = this.standRocketChunk.mesh;
-    //                 // this.chunk = this.standRocketChunk;
-    //                 break;
-    //             case Weapon.none:
-    //                 this.mesh = this.standChunk.mesh;
-    //                 this.chunk = this.standChunk;
-    //                 break;
-    //         }
-    //         break;
-    //     case Model.run1:
-    //         switch (this.weapon) {
-    //             case Weapon.shotgun:
-    //                 // this.mesh = this.run1ShotgunChunk.mesh;
-    //                 // this.chunk = this.run1ShotgunChunk;
-    //                 break;
-    //             case Weapon.rocket:
-    //                 // this.mesh = this.run1RocketChunk.mesh;
-    //                 // this.chunk = this.run1RocketChunk;
-    //                 break;
-    //             case Weapon.none:
-    //                 // this.mesh = this.run1Chunk.mesh;
-    //                 // this.chunk = this.run1Chunk;
-    //                 break;
-    //         }
-    //         break;
-    //     case Model.run2:
-    //         switch (this.weapon) {
-    //             case Weapon.shotgun:
-    //                 // this.mesh = this.run2ShotgunChunk.mesh;
-    //                 // this.chunk = this.run2ShotgunChunk;
-    //                 break;
-    //             case Weapon.rocket:
-    //                 // this.mesh = this.run2RocketChunk.mesh;
-    //                 // this.chunk = this.run2RocketChunk;
-    //                 break;
-    //             case Weapon.none:
-    //                 // this.mesh = this.run2Chunk.mesh;
-    //                 // this.chunk = this.run2Chunk;
-    //                 break;
-    //         }
-    //         break;
-    //     case Model.shoot:
-    //         switch (this.weapon) {
-    //             case Weapon.shotgun:
-    //                 // this.mesh = this.shootShotgunChunk.mesh;
-    //                 // this.chunk = this.shootShotgunChunk;
-    //                 break;
-    //             case Weapon.rocket:
-    //                 // this.mesh = this.shootRocketChunk.mesh;
-    //                 // this.chunk = this.shootRocketChunk;
-    //                 break;
-    //             case Weapon.none:
-    //                 // this.mesh = this.shootChunk.mesh;
-    //                 // this.chunk = this.shootChunk;
-    //                 break;
-    //         }
-    //         break;
-    //     case Model.fall:
-    //         switch (this.weapon) {
-    //             case Weapon.shotgun:
-    //                 // this.mesh = this.fallShotgunChunk.mesh;
-    //                 // this.chunk = this.fallShotgunChunk;
-    //                 break;
-    //             case Weapon.rocket:
-    //                 // this.mesh = this.fallRocketChunk.mesh;
-    //                 // this.chunk = this.fallRocketChunk;
-    //                 break;
-    //             case Weapon.none:
-    //                 // this.mesh = this.fallChunk.mesh;
-    //                 // this.chunk = this.fallChunk;
-    //                 break;
-    //         }
-    //         break;
-    //     default:
-    //         this.mesh = this.standChunk.mesh;
-    //         this.chunk = this.standChunk;
-    // }
     this.mesh = this.standChunk.mesh;
     this.chunk = this.standChunk;
     this.mesh.position.set(pos.x, pos.y, pos.z);
     this.mesh.rotation.set(rot.x, rot.y, rot.z);
     this.currentModel = model;
     this.mesh.updateMatrixWorld();
-    this.mesh.add(this.cameraObj);
+    try {
+      this.mesh.add(this.cameraObj);
+    } catch (error) {}
+
     this.mesh.visible = true;
   };
 
@@ -256,8 +140,8 @@ export default class Player {
 
   touchMove = ({ dx, dy }) => {
     // let event = jevent.originalEvent;
-    let movementX = dx / window.innerWidth;
-    let movementZ = dy / window.innerHeight;
+    let movementX = dx / width;
+    let movementZ = dy / height;
     let x = movementX * 0.1;
     let z = movementZ * 0.1;
 
