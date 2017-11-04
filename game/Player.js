@@ -465,15 +465,6 @@ export default class Player {
   };
 
   keyDown = () => {
-    // if (this.controls.rocket) {
-    //   this.weapon = Weapon.rocket;
-    // }
-    // if (this.controls.shotgun) {
-    //   this.weapon = Weapon.shotgun;
-    // }
-    // if (this.controls.none) {
-    //   this.weapon = Weapon.none;
-    // }
     if (this.controls.die) {
       this.die();
     }
