@@ -70,51 +70,54 @@ export default class App extends React.Component {
       bottom: "die"
     };
 
-    //
-    //
-    // <Dpad
-    //   onPress={pressIn}
-    //   onPressOut={pressOut}
-    //   style={{ position: "absolute", bottom: 8, left: 8 }}
-    // />
-    // <Dpad
-    //   buttonMap={rightButtonMap}
-    //   style={{ position: "absolute", bottom: 8, right: 8 }}
-    //   onPress={pressIn}
-    //   onPressOut={pressOut}
-    // />
     return (
       <View style={{ flex: 1 }}>
         <StatusBar hidden={false} />
         {<Main onLoaded={game => this.setState({ loaded: true, game })} />}
-        {
-          <FooterControls
-            onHotBarPress={item => {
-              console.warn(item, this.state.game.player.weapon);
-              this.setState({ selected: item });
-              this.state.game.player.weapon = item;
-            }}
-            selected={this.state.selected}
-            pressIn={pressIn}
-            pressOut={pressOut}
-            items={Object.keys(Weapon)}
-          />
-        }
+        <Button
+          pressOut={pressOut}
+          pressIn={pressIn}
+          id="die"
+          style={{
+            width: 25,
+            height: 25,
+            borderRadius: 12.5,
+            position: "absolute",
+            top: 20,
+            left: 8
+          }}
+        />
+
+        <FooterControls
+          onHotBarPress={item => {
+            this.setState({ selected: item });
+            this.state.game.player.weapon = item;
+          }}
+          selected={this.state.selected}
+          pressIn={pressIn}
+          pressOut={pressOut}
+          items={Object.keys(Weapon)}
+        />
 
         {!this.state.loaded && <Loading />}
       </View>
     );
   }
 }
+
 class Loading extends React.PureComponent {
   render() {
     return (
-      <Expo.LinearGradient
+      <View
         style={StyleSheet.flatten([
           StyleSheet.absoluteFill,
-          { flex: 1, justifyContent: "center", alignItems: "center" }
+          {
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "#056ecf"
+          }
         ])}
-        colors={["#4c669f", "#3b5998", "#056ecf"]}
       >
         <TouchableBounce
           style={{
@@ -129,7 +132,7 @@ class Loading extends React.PureComponent {
             source={require("./assets/icons/loading-icon.png")}
           />
         </TouchableBounce>
-      </Expo.LinearGradient>
+      </View>
     );
   }
 }
@@ -151,17 +154,15 @@ class Button extends React.PureComponent {
   };
 
   render() {
-    const size = 32;
-    const { style } = this.props;
+    const { style, id } = this.props;
     return (
       <TapGestureHandler onHandlerStateChange={this._onSingleTap}>
         <View
           style={[
             {
-              margin: 1,
-              width: size,
-              height: size,
-              backgroundColor: "rgba(128, 128, 128, 0.6)",
+              flex: 1,
+              aspectRatio: 1,
+              backgroundColor: "rgba(255, 255, 255, 0.6)",
               borderRadius: 3
             },
             style
@@ -170,7 +171,7 @@ class Button extends React.PureComponent {
           {icons.hasOwnProperty(id) && (
             <Image
               source={icons[id]}
-              style={{ flex: 1, backgroundColor: "red", resizeMode: "contain" }}
+              style={{ flex: 1, resizeMode: "contain" }}
             />
           )}
         </View>
@@ -216,25 +217,6 @@ export class DPad extends React.Component {
   }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "transparent",
-    height: 100,
-    aspectRatio: 1
-  },
-  uiComponent: {
-    backgroundColor: "gray"
-  },
-  button: {
-    aspectRatio: 1
-  },
-  roundButton: {
-    width: 50,
-    aspectRatio: 1,
-    borderRadius: 25
-  }
-});
-
 export class FooterControls extends Component {
   render() {
     const { pressIn, pressOut, items, onHotBarPress, selected } = this.props;
@@ -275,8 +257,7 @@ const HotBar = ({ items, selected, onPress }) => (
         <View
           key={index}
           style={{
-            borderWidth: item === selected ? 5 : 1,
-            borderColor: "white",
+            transform: [{ scale: item === selected ? 1 : 0.6 }],
             aspectRatio: 1,
             minWidth: 50
           }}
@@ -287,7 +268,10 @@ const HotBar = ({ items, selected, onPress }) => (
               onPress(item);
             }}
           >
-            <View style={{ flex: 1, backgroundColor: "gray" }} />
+            <Image
+              source={icons[item]}
+              style={{ flex: 1, width: 50, height: 50, resizeMode: "contain" }}
+            />
           </TouchableOpacity>
         </View>
       );
@@ -296,12 +280,7 @@ const HotBar = ({ items, selected, onPress }) => (
 );
 
 const RightControls = ({ pressIn, pressOut, style }) => (
-  <View
-    style={[
-      { aspectRatio: 1, width: 100, backgroundColor: "rgba(255,255,255,0.5)" },
-      style
-    ]}
-  >
+  <View style={[{ aspectRatio: 1, width: 100 }, style]}>
     <View style={{ alignItems: "flex-end", flex: 1 }}>
       <Button
         style={styles.roundButton}
@@ -320,3 +299,20 @@ const RightControls = ({ pressIn, pressOut, style }) => (
     </View>
   </View>
 );
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: "transparent",
+    height: 100,
+    aspectRatio: 1
+  },
+  uiComponent: {},
+  button: {
+    aspectRatio: 1
+  },
+  roundButton: {
+    width: 50,
+    aspectRatio: 1,
+    borderRadius: 25
+  }
+});
