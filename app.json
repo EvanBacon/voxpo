@@ -4,7 +4,7 @@
     "description": "A cool chunky world!",
     "slug": "voxpo",
     "privacy": "public",
-    "sdkVersion": "21.0.0",
+    "sdkVersion": "22.0.0",
     "version": "1.0.0",
     "orientation": "landscape",
     "primaryColor": "#056ecf",
