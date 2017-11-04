@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Component } from "react";
 import {
   StyleSheet,
   Image,
@@ -19,28 +19,21 @@ import DirectionType from "./enums/Direction";
 
 import Maps from "./Maps";
 import Models from "./Models";
+
+import Weapon from "./enums/Weapon";
+
 const { TapGestureHandler, State } = Expo.DangerZone.GestureHandler;
 
-export default class App extends React.Component {
-  state = { assetsLoaded: false, loaded: true };
+const icons = {
+  rocket: require("./assets/images/missile.png"),
+  explosive: require("./assets/images/grenade.png"),
+  shotgun: require("./assets/images/shotgun.png"),
+  none: require("./assets/images/fist.png")
+};
 
-  constructor() {
-    super();
-    this._translateX = new Animated.Value(0);
-    this._translateY = new Animated.Value(0);
-    this._lastOffset = { x: 0, y: 0 };
-    this._onGestureEvent = Animated.event(
-      [
-        {
-          nativeEvent: {
-            translationX: this._translateX,
-            translationY: this._translateY
-          }
-        }
-      ],
-      { useNativeDriver: false }
-    );
-  }
+export default class App extends React.Component {
+  state = { assetsLoaded: false, loaded: false };
+
   async componentWillMount() {
     // await this._preload();
     this.setState({ assetsLoaded: true });
@@ -56,14 +49,14 @@ export default class App extends React.Component {
     if (!this.state.assetsLoaded) {
       return <Loading />;
     }
-    const pressIn = direction => {
+    const pressIn = id => {
       if (this.state.game) {
-        this.state.game.player.controls[direction] = true;
+        this.state.game.player.controls[id] = true;
       }
     };
-    const pressOut = direction => {
+    const pressOut = id => {
       if (this.state.game) {
-        this.state.game.player.controls[direction] = null;
+        this.state.game.player.controls[id] = null;
       }
     };
     //jump
@@ -77,32 +70,42 @@ export default class App extends React.Component {
       bottom: "die"
     };
 
-    // {<Main onLoaded={game => this.setState({ loaded: true, game })} />}
-    // 
     //
+    //
+    // <Dpad
+    //   onPress={pressIn}
+    //   onPressOut={pressOut}
+    //   style={{ position: "absolute", bottom: 8, left: 8 }}
+    // />
+    // <Dpad
+    //   buttonMap={rightButtonMap}
+    //   style={{ position: "absolute", bottom: 8, right: 8 }}
+    //   onPress={pressIn}
+    //   onPressOut={pressOut}
+    // />
     return (
       <View style={{ flex: 1 }}>
         <StatusBar hidden={false} />
+        {<Main onLoaded={game => this.setState({ loaded: true, game })} />}
+        {
+          <FooterControls
+            onHotBarPress={item => {
+              console.warn(item, this.state.game.player.weapon);
+              this.setState({ selected: item });
+              this.state.game.player.weapon = item;
+            }}
+            selected={this.state.selected}
+            pressIn={pressIn}
+            pressOut={pressOut}
+            items={Object.keys(Weapon)}
+          />
+        }
 
-
-        {<FooterControls />}
-        <Dpad
-          onPress={pressIn}
-          onPressOut={pressOut}
-          style={{ position: "absolute", bottom: 8, left: 8 }}
-        />
-        <Dpad
-          buttonMap={rightButtonMap}
-          style={{ position: "absolute", bottom: 8, right: 8 }}
-          onPress={pressIn}
-          onPressOut={pressOut}
-        />
         {!this.state.loaded && <Loading />}
       </View>
     );
   }
 }
-
 class Loading extends React.PureComponent {
   render() {
     return (
@@ -133,14 +136,14 @@ class Loading extends React.PureComponent {
 
 class Button extends React.PureComponent {
   _onSingleTap = ({ nativeEvent: { state } }) => {
-    const { onPress, id, onPressOut } = this.props;
+    const { pressIn, id, pressOut } = this.props;
 
     switch (state) {
       case State.BEGAN:
-        onPress(id);
+        pressIn(id);
         break;
       case State.ACTIVE:
-        onPressOut(id);
+        pressOut(id);
         break;
       default:
         break;
@@ -148,27 +151,35 @@ class Button extends React.PureComponent {
   };
 
   render() {
-    const size = 50 - 4;
-    const { style, onPress, id, onPressOut } = this.props;
+    const size = 32;
+    const { style } = this.props;
     return (
-      <View
-        style={[style, { padding: 2 }]}>
-        <TapGestureHandler onHandlerStateChange={this._onSingleTap}>
-          <View
-            style={{
+      <TapGestureHandler onHandlerStateChange={this._onSingleTap}>
+        <View
+          style={[
+            {
+              margin: 1,
               width: size,
               height: size,
               backgroundColor: "rgba(128, 128, 128, 0.6)",
               borderRadius: 3
-            }}
-          />
-        </TapGestureHandler>
-      </View>
+            },
+            style
+          ]}
+        >
+          {icons.hasOwnProperty(id) && (
+            <Image
+              source={icons[id]}
+              style={{ flex: 1, backgroundColor: "red", resizeMode: "contain" }}
+            />
+          )}
+        </View>
+      </TapGestureHandler>
     );
   }
 }
 
-export class Dpad extends React.Component {
+export class DPad extends React.Component {
   static defaultProps = {
     buttonMap: {
       top: DirectionType.forward,
@@ -180,45 +191,25 @@ export class Dpad extends React.Component {
   };
 
   render() {
-    const { onPress, onPressOut, style, buttonMap } = this.props;
+    const { pressIn, pressOut, style, buttonMap } = this.props;
     return (
       <View pointerEvents={"box-none"} style={[styles.container, style]}>
         <View
           pointerEvents={"box-none"}
           style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
         >
-          <Button
-            onPressOut={onPressOut}
-            onPress={onPress}
-            id={buttonMap.top}
-          />
+          <Button pressOut={pressOut} pressIn={pressIn} id={buttonMap.top} />
         </View>
         <View pointerEvents={"box-none"} style={{ flexDirection: "row" }}>
-          <Button
-            onPressOut={onPressOut}
-            onPress={onPress}
-            id={buttonMap.left}
-          />
-          <Button
-            onPressOut={onPressOut}
-            onPress={onPress}
-            id={buttonMap.middle}
-          />
-          <Button
-            onPressOut={onPressOut}
-            onPress={onPress}
-            id={buttonMap.right}
-          />
+          <Button pressOut={pressOut} pressIn={pressIn} id={buttonMap.left} />
+          <Button pressOut={pressOut} pressIn={pressIn} id={buttonMap.middle} />
+          <Button pressOut={pressOut} pressIn={pressIn} id={buttonMap.right} />
         </View>
         <View
           pointerEvents={"box-none"}
           style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
         >
-          <Button
-            onPressOut={onPressOut}
-            onPress={onPress}
-            id={buttonMap.bottom}
-          />
+          <Button pressOut={pressOut} pressIn={pressIn} id={buttonMap.bottom} />
         </View>
       </View>
     );
@@ -228,97 +219,104 @@ export class Dpad extends React.Component {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "transparent",
-    height: 50 * 3,
-    width: 50 * 3
+    height: 100,
+    aspectRatio: 1
   },
   uiComponent: {
-    backgroundColor: 'gray',
+    backgroundColor: "gray"
   },
   button: {
-    aspectRatio: 1,
+    aspectRatio: 1
   },
   roundButton: {
     width: 50,
-    borderRadius: 25,
-  },
-
+    aspectRatio: 1,
+    borderRadius: 25
+  }
 });
 
-export default class FooterControls extends Component {
+export class FooterControls extends Component {
   render() {
-    const items = [
-      {
-        name: 'rocket',
-        id: 'rocket',
-        selected: true,
-      },
-      {
-        name: 'hand',
-        id: 'hand',
-        selected: false,
-      }
-    ];
+    const { pressIn, pressOut, items, onHotBarPress, selected } = this.props;
     return (
-        <View
-          style={{
-            position: 'absolute',
-            backgroundColor: 'red',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            paddding: 24,
-            justifyContent: 'space-between',
-            flexDirection: 'row',
-            alignItems: 'flex-end'
-          }}>
-
-          <DPad />
-          <HotBar items={items}/>
-          <RightControls />
-        </View>
+      <View
+        style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          padding: 8,
+          justifyContent: "space-between",
+          flexDirection: "row",
+          alignItems: "flex-end"
+        }}
+      >
+        <DPad pressIn={pressIn} pressOut={pressOut} />
+        <HotBar items={items} selected={selected} onPress={onHotBarPress} />
+        <RightControls pressIn={pressIn} pressOut={pressOut} />
+      </View>
     );
   }
 }
 
-const HotBar = ({items}) => (
-  <View style={[styles.uiComponent, {alignItems: 'stretch', height: 50, flexDirection: 'row', borderRadius: 4}]}>
-    {
-      items.map((item, index) => {
-        return (
-          <Button key={index} style={{ borderWidth: item.selected ? 5 : 1, borderColor: 'white' }} />
-          )
-      })
-    }
+const HotBar = ({ items, selected, onPress }) => (
+  <View
+    style={[
+      styles.uiComponent,
+      {
+        flexDirection: "row",
+        borderRadius: 4,
+        height: 50
+      }
+    ]}
+  >
+    {items.map((item, index) => {
+      return (
+        <View
+          key={index}
+          style={{
+            borderWidth: item === selected ? 5 : 1,
+            borderColor: "white",
+            aspectRatio: 1,
+            minWidth: 50
+          }}
+        >
+          <TouchableOpacity
+            style={{ flex: 1 }}
+            onPress={() => {
+              onPress(item);
+            }}
+          >
+            <View style={{ flex: 1, backgroundColor: "gray" }} />
+          </TouchableOpacity>
+        </View>
+      );
+    })}
   </View>
-  );
-
+);
 
 const RightControls = ({ pressIn, pressOut, style }) => (
-  <View style={[{ aspectRatio: 1, width: 100, backgroundColor: 'rbga(255,255,255,100)' }, style]}>
-    <View style={{ alignItems: 'flex-end', flex: 1 }}>
+  <View
+    style={[
+      { aspectRatio: 1, width: 100, backgroundColor: "rgba(255,255,255,0.5)" },
+      style
+    ]}
+  >
+    <View style={{ alignItems: "flex-end", flex: 1 }}>
       <Button
         style={styles.roundButton}
-        id="a"
+        id="fire"
         pressIn={pressIn}
         pressOut={pressOut}
       />
     </View>
-    <View style={{ alignItems: 'flex-start', flex: 1 }}>
+    <View style={{ alignItems: "flex-start", flex: 1 }}>
       <Button
         style={styles.roundButton}
-        id="b"
+        id="explosive"
         pressIn={pressIn}
         pressOut={pressOut}
       />
     </View>
   </View>
 );
-
-export class Button extends Component {
-  render() {
-    return (
-      <View style={[styles.uiComponent, styles.button, this.props.style]} />
-    );
-  }
-}
-

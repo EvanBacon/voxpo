@@ -70,7 +70,6 @@ export default class Player {
   }
 
   init = name => {
-    this.addTouchListeners();
     this.name = name;
     this.hp = Settings.max_hp;
 
@@ -247,12 +246,6 @@ export default class Player {
     this.mesh.updateMatrixWorld();
     this.mesh.add(this.cameraObj);
     this.mesh.visible = true;
-  };
-
-  addTouchListeners = () => {
-    // window.document.addEventListener("touchstart", this.touchStart);
-    // window.document.addEventListener("touchmove", this.touchMove);
-    // window.document.addEventListener("touchend", this.touchEnd);
   };
 
   touchStart = () => {
@@ -472,15 +465,15 @@ export default class Player {
   };
 
   keyDown = () => {
-    if (this.controls.rocket) {
-      this.weapon = Weapon.rocket;
-    }
-    if (this.controls.shotgun) {
-      this.weapon = Weapon.shotgun;
-    }
-    if (this.controls.none) {
-      this.weapon = Weapon.none;
-    }
+    // if (this.controls.rocket) {
+    //   this.weapon = Weapon.rocket;
+    // }
+    // if (this.controls.shotgun) {
+    //   this.weapon = Weapon.shotgun;
+    // }
+    // if (this.controls.none) {
+    //   this.weapon = Weapon.none;
+    // }
     if (this.controls.die) {
       this.die();
     }
