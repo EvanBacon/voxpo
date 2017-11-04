@@ -125,9 +125,9 @@ export default class Player {
     this.mesh.rotation.set(rot.x, rot.y, rot.z);
     this.currentModel = model;
     this.mesh.updateMatrixWorld();
-    try {
+    if (this.cameraObj instanceof THREE.Object3D) {
       this.mesh.add(this.cameraObj);
-    } catch (error) {}
+    }
 
     this.mesh.visible = true;
   };
